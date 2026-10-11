@@ -39,7 +39,7 @@ namespace Math
 	static_assert(sizeof(Vector2) == 2 * sizeof(float), "Vector2 must be exactly 2 floats in size");
 	static_assert(alignof(Vector2) == alignof(float), "Vector2 must not be aligned more strictly than a float");
 	static_assert(std::is_standard_layout_v<Vector2>, "Vector2 must be standard_layout");
-	static_assert(std::is_trivially_copyable_v<Vector2>, "Vector2 must be trivially_copyable");
+	static_assert(std::is_trivially_copyable_v<Vector2>, "Vector must be trivially_copyable");
 	static_assert(offsetof(Vector2, x) == 0, "x must be at offset 0");
 	static_assert(offsetof(Vector2, y) == sizeof(float), "y must follow x");
 

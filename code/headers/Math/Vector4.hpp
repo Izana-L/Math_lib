@@ -2,10 +2,9 @@
 
 #include <cstddef>
 #include <type_traits>
-
+#include <Math/Vector3.hpp>
 namespace Math
 {
-
 
 	struct Vector4
 	{
@@ -14,6 +13,7 @@ namespace Math
 		constexpr Vector4() noexcept : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
 
 		constexpr Vector4(const float _x, const float _y, const float _z, const float _w) noexcept : x(_x), y(_y), z(_z), w(_w) {}
+		constexpr Vector4(Vector3 _vector3, const float _w) noexcept : x(_vector3.x), y(_vector3.y), z(_vector3.z), w(_w) {}
 		constexpr explicit Vector4(const float value) noexcept : x(value), y(value), z(value), w(value) {}
 
 		[[nodiscard]] constexpr float& operator[](std::size_t index) noexcept
@@ -35,7 +35,10 @@ namespace Math
 		{
 			return(this->x != other_vector.x || this->y != other_vector.y || this->z != other_vector.z || this->w != other_vector.w);
 		}
-
+		[[nodiscard]] constexpr Vector3 Xyz() const noexcept
+		{
+			return Vector3(x, y, z);
+		}
 	};
 
 	static_assert(sizeof(Vector4) == 4 * sizeof(float), "Vector4 must be exactly 4 floats in size");
