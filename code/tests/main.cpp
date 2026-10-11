@@ -6,9 +6,9 @@
 int main() 
 {
 
-    Math::Vector3 v;
-    Math::Vector2 v;
-    Math::Vector4 v;
+    Math::Vector3 v3;
+    Math::Vector2 v2;
+    Math::Vector4 v4;
 
     std::cout << "Math_tests: OK\n";
     return 0;
