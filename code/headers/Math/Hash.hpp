@@ -30,7 +30,7 @@ namespace std
 
 			Math::detail::Hash_combine(seed, hasher(vector.x));
 			Math::detail::Hash_combine(seed, hasher(vector.y));
-			Math::detail::Hash_combine(seed, hasher(vector.z));
+		
 
 			return seed;
 		}
@@ -63,6 +63,7 @@ namespace std
 			Math::detail::Hash_combine(seed, hasher(vector.x));
 			Math::detail::Hash_combine(seed, hasher(vector.y));
 			Math::detail::Hash_combine(seed, hasher(vector.z));
+			Math::detail::Hash_combine(seed, hasher(vector.w));
 
 			return seed;
 		}
