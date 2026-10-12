@@ -23,7 +23,7 @@ namespace std
 	requires std::is_arithmetic_v<T>
 	struct hash<Math::Vector2T<T>>
 	{
-		[[nodiscard]] std::size_t operator()(const Math::Vector3& vector) const noexcept
+		[[nodiscard]] std::size_t operator()(const Math::Vector2T<T>& vector) const noexcept
 		{
 			std::size_t seed = 0;
 			std::hash<T> hasher;
@@ -39,7 +39,7 @@ namespace std
 	requires std::is_arithmetic_v<T>
 	struct hash<Math::Vector3T<T>>
 	{
-		[[nodiscard]] std::size_t operator()(const Math::Vector3& vector) const noexcept
+		[[nodiscard]] std::size_t operator()(const Math::Vector3T<T>& vector) const noexcept
 		{
 			std::size_t seed = 0;
 			std::hash<T> hasher;
@@ -55,7 +55,7 @@ namespace std
 	requires std::is_arithmetic_v<T>
 	struct hash<Math::Vector4T<T>>
 	{
-		[[nodiscard]] std::size_t operator()(const Math::Vector3& vector) const noexcept
+		[[nodiscard]] std::size_t operator()(const Math::Vector4T<T>& vector) const noexcept
 		{
 			std::size_t seed = 0;
 			std::hash<T> hasher;

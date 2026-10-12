@@ -16,7 +16,7 @@ namespace Math
 		constexpr Vector2T() noexcept : x(), y(){}
 
 		constexpr Vector2T(const Type _x, const Type _y) noexcept : x(_x), y(_y) {}
-		constexpr explicit Vector2T(const float value) noexcept : x(value), y(value) {}
+		constexpr explicit Vector2T(const Type value) noexcept : x(value), y(value) {}
 
 		[[nodiscard]] constexpr Type& operator[](std::size_t index) noexcept
 		{
