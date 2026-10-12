@@ -1,5 +1,6 @@
 #pragma once 
 
+#include <cstdint>
 #include <cstddef>
 #include <type_traits>
 #include <Math/Vector2T.hpp>
