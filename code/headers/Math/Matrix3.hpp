@@ -45,6 +45,6 @@ namespace Math
 	static_assert(std::is_standard_layout_v<Matrix3>, "Matrix3 must be standard_layout");
 	static_assert(std::is_trivially_copyable_v<Matrix3>, "Matrix3 must be trivially_copyable");
 	static_assert(offsetof(Matrix3, columns[0]) == 0, "x must be at offset 0");
-	static_assert(offsetof(Matrix3, columns[1]) == sizeof(Vector3), "y must follow x");
-	static_assert(offsetof(Matrix3, columns[2]) == 2 * sizeof(Vector3), "z must follow y");
+	static_assert(offsetof(Matrix3, columns[1]) == sizeof(Vector3), "colum[1] must follow colum[0]");
+	static_assert(offsetof(Matrix3, columns[2]) == 2 * sizeof(Vector3), "colum[2] must follow colum[1]");
 }

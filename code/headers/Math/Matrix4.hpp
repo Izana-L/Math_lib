@@ -34,15 +34,15 @@ namespace Math
 		[[nodiscard]] constexpr static Matrix4 Zero() noexcept { return Matrix4(Vector4(0.0f, 0.0f, 0.0f, 0.0f), 
 																	            Vector4(0.0f, 0.0f, 0.0f, 0.0f), 
 																				Vector4(0.0f, 0.0f, 0.0f, 0.0f), 
-																				Vector4(0.0f, 0.0f, 0.0f, 0.0f)); }
+																				Vector4(0.0f, 0.0f, 0.0f, 0.0f));}
 
 		[[nodiscard]] constexpr bool operator==(const Matrix4& other_matrix) const noexcept
 		{
-			return(this->columns[0] == other_matrix.columns[0] && this->columns[1] == other_matrix.columns[1] && this->columns[2] == other_matrix.columns[2]);
+			return(this->columns[0] == other_matrix.columns[0] && this->columns[1] == other_matrix.columns[1] && this->columns[2] == other_matrix.columns[2] && this->columns[3] == other_matrix.columns[3]);
 		}
 		[[nodiscard]] constexpr bool operator!=(const Matrix4& other_matrix) const noexcept
 		{
-			return(this->columns[0] != other_matrix.columns[0] || this->columns[1] != other_matrix.columns[1] || this->columns[2] != other_matrix.columns[2]);
+			return(this->columns[0] != other_matrix.columns[0] || this->columns[1] != other_matrix.columns[1] || this->columns[2] != other_matrix.columns[2] || this->columns[3] == other_matrix.columns[3]);
 		}
 
 	};
@@ -51,7 +51,7 @@ namespace Math
 	static_assert(std::is_standard_layout_v<Matrix4>, "Matrix4 must be standard_layout");
 	static_assert(std::is_trivially_copyable_v<Matrix4>, "Matrix4 must be trivially_copyable");
 	static_assert(offsetof(Matrix4, columns[0]) == 0, "x must be at offset 0");
-	static_assert(offsetof(Matrix4, columns[1]) == sizeof(Vector4), "y must follow x");
-	static_assert(offsetof(Matrix4, columns[2]) == 2 * sizeof(Vector4), "z must follow y");
-	static_assert(offsetof(Matrix4, columns[3]) == 3 * sizeof(Vector4), "z must follow y");
+	static_assert(offsetof(Matrix4, columns[1]) == sizeof(Vector4), "colum[1] must follow colum[0]");
+	static_assert(offsetof(Matrix4, columns[2]) == 2 * sizeof(Vector4), "colum[2] must follow colum[1]");
+	static_assert(offsetof(Matrix4, columns[3]) == 3 * sizeof(Vector4), "colum[3] must follow colum[2]");
 }
