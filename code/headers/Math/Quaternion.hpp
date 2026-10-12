@@ -37,7 +37,7 @@ namespace Math
 		}
 
 	};
-	static_assert(sizeof(Quaternion) == 4 * sizeof(float), "v must be exactly 4 floats in size");
+	static_assert(sizeof(Quaternion) == 4 * sizeof(float), "Quaternion must be exactly 4 floats in size");
 	static_assert(alignof(Quaternion) == alignof(float), "Quaternion must not be aligned more strictly than a float");
 	static_assert(std::is_standard_layout_v<Quaternion>, "Quaternion must be standard_layout");
 	static_assert(std::is_trivially_copyable_v<Quaternion>, "Vector4 must be trivially_copyable");

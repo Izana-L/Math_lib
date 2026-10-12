@@ -42,7 +42,7 @@ namespace Math
 		}
 		[[nodiscard]] constexpr bool operator!=(const Matrix4& other_matrix) const noexcept
 		{
-			return(this->columns[0] != other_matrix.columns[0] || this->columns[1] != other_matrix.columns[1] || this->columns[2] != other_matrix.columns[2] || this->columns[3] == other_matrix.columns[3]);
+			return(this->columns[0] != other_matrix.columns[0] || this->columns[1] != other_matrix.columns[1] || this->columns[2] != other_matrix.columns[2] || this->columns[3] != other_matrix.columns[3]);
 		}
 
 	};
