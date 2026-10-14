@@ -1,9 +1,10 @@
-#pragma once 
+#pragma once
 
 #include <cstdint>
 #include <cstddef>
 #include <type_traits>
-
+#include <concepts>
+#include <cmath>
 namespace Math
 {
 	template <typename T>
@@ -36,6 +37,73 @@ namespace Math
 		[[nodiscard]] constexpr bool operator!=(const Vector2T<Type>& other_vector) const noexcept
 		{
 			return(this->x != other_vector.x || this->y != other_vector.y );
+		}
+
+		[[nodiscard]] constexpr Vector2T operator-() const noexcept requires (!std::unsigned_integral<Type>)
+		{return Vector2T(-x, -y);}
+		constexpr Vector2T& operator+=(const Vector2T& other_vector) noexcept
+		{
+    		x+=other_vector.x;
+    		y+=other_vector.y;
+    		return *this;
+		}
+		constexpr Vector2T& operator-=(const Vector2T& other_vector) noexcept
+		{
+    		x-=other_vector.x;
+    		y-=other_vector.y;
+    		return *this;
+		}
+		constexpr Vector2T& operator*=( Type scalar) noexcept
+		{
+    		x*=scalar;
+    		y*=scalar;
+    		return *this;
+		}
+		constexpr Vector2T& operator/=( Type scalar) noexcept
+		{
+        	x/=scalar;
+        	y/=scalar;
+        	return *this;
+	    }
+
+		[[nodiscard]] friend constexpr Vector2T operator+( Vector2T vector_a, const Vector2T& vector_b) noexcept
+		{ return vector_a+=vector_b; }
+		[[nodiscard]] friend constexpr Vector2T operator-(Vector2T vector_a, const Vector2T& vector_b) noexcept
+		{ return  vector_a-=vector_b; }
+		[[nodiscard]] friend constexpr Vector2T operator*(Vector2T vector, Type scalar) noexcept
+		{ return  vector*=scalar; }
+		[[nodiscard]] friend constexpr Vector2T operator*(Type scalar, Vector2T vector) noexcept
+		{ return  vector*=scalar; }
+		[[nodiscard]] friend constexpr Vector2T operator/(Vector2T vector, Type scalar) noexcept
+		{ return  vector/=scalar; }
+		[[nodiscard]] friend constexpr Vector2T operator*(const Vector2T& vector_a, const Vector2T& vector_b) noexcept
+		{ return Vector2T(vector_a.x*vector_b.x,vector_a.y*vector_b.y); }
+		[[nodiscard]] friend constexpr Vector2T operator/(const Vector2T& vector_a, const Vector2T& vector_b) noexcept
+		{ return Vector2T(vector_a.x/vector_b.x,vector_a.y/vector_b.y); }
+
+		[[nodiscard]] constexpr Type Dot(const Vector2T vector_a, const Vector2T vector_b) noexcept
+		{
+			return vector_a.x * vector_b.x + vector_a.y * vector_b.y;
+		}
+
+		[[nodiscard]] constexpr T Length_squared(const Vector2T vector) noexcept
+		{
+			return Dot(vector, vector);
+		}
+		template <std::floating_point Type>
+		[[nodiscard]] Type Length(const Vector2T vector) noexcept
+		{
+			return std::sqrt(Length_squared(vector));
+		}
+
+		[[nodiscard]] constexpr Type Distance_squared(const Vector2T vector_a, const Vector2T vector_b) noexcept
+		{
+			return Length_squared(vector_a - vector_b);
+		}
+		template <std::floating_point Type>
+		[[nodiscard]] Type Distance(const Vector2T vector_a, const Vector2T vector_b) noexcept
+		{
+			return Length(vector_a - vector_b);
 		}
 
 	};

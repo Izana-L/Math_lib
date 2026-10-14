@@ -1,0 +1,125 @@
+diff --git a/.gitignore b/.gitignore
+index 1d00a42..c17142b 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -15,6 +15,10 @@ CMakeFiles/
+ cmake_install.cmake
+ CMakeUserPresets.json
+ 
++# clangd (Zed / VS Code): copia generada por cmake/configure-preset.cmake e índice
++/compile_commands.json
++.cache/
++
+ # Binarios y objetos
+ *.exe
+ *.obj
+diff --git a/.zed/tasks.json b/.zed/tasks.json
+new file mode 100644
+index 0000000..227d5b0
+--- /dev/null
++++ b/.zed/tasks.json
+@@ -0,0 +1,57 @@
++// Tareas de Zed (command palette: "task: spawn"). Equivalen al selector de
++// configuración de Visual Studio: elige el preset y la acción.
++//
++// - "configurar" ejecuta el preset y copia compile_commands.json a la raíz
++//   (clangd lo usa para el autocompletado). Vuelve a ejecutarlo si cambias de
++//   preset o si añades/quitas archivos .cpp.
++// - Windows: abre Zed desde una "Developer PowerShell for VS" (cl.exe + $env{VSINSTALLDIR}).
++// - WSL: abre la carpeta con "projects: open in wsl" y usa las tareas "WSL".
++[
++  // ---------------- Windows x64-debug ----------------
++  {
++    "label": "Windows x64-debug: configurar",
++    "command": "cmake",
++    "args": ["-DPRESET=x64-debug", "-P", "cmake/configure-preset.cmake"]
++  },
++  {
++    "label": "Windows x64-debug: compilar",
++    "command": "cmake",
++    "args": ["--build", "projects/out/build/x64-debug"]
++  },
++  {
++    "label": "Windows x64-debug: ejecutar Math_tests",
++    "command": "projects\\out\\build\\x64-debug\\Math_tests.exe"
++  },
++
++  // ---------------- Windows x64-release ----------------
++  {
++    "label": "Windows x64-release: configurar",
++    "command": "cmake",
++    "args": ["-DPRESET=x64-release", "-P", "cmake/configure-preset.cmake"]
++  },
++  {
++    "label": "Windows x64-release: compilar",
++    "command": "cmake",
++    "args": ["--build", "projects/out/build/x64-release"]
++  },
++  {
++    "label": "Windows x64-release: ejecutar Math_tests",
++    "command": "projects\\out\\build\\x64-release\\Math_tests.exe"
++  },
++
++  // ---------------- WSL / Linux linux-debug ----------------
++  {
++    "label": "WSL linux-debug: configurar",
++    "command": "cmake",
++    "args": ["-DPRESET=linux-debug", "-P", "cmake/configure-preset.cmake"]
++  },
++  {
++    "label": "WSL linux-debug: compilar",
++    "command": "cmake",
++    "args": ["--build", "projects/out/build/linux-debug"]
++  },
++  {
++    "label": "WSL linux-debug: ejecutar Math_tests",
++    "command": "./projects/out/build/linux-debug/Math_tests"
++  }
++]
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9725fd7..3cadd26 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -12,6 +12,9 @@ set(CMAKE_CXX_STANDARD 20)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ set(CMAKE_CXX_EXTENSIONS OFF)
+ 
++# compile_commands.json para clangd (Zed, VS Code...). Solo lo generan los generadores Ninja/Makefile.
++set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
++
+ 
+ set(CODE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/code)
+ 
+diff --git a/cmake/configure-preset.cmake b/cmake/configure-preset.cmake
+new file mode 100644
+index 0000000..4da9002
+--- /dev/null
++++ b/cmake/configure-preset.cmake
+@@ -0,0 +1,27 @@
++# Uso: cmake -DPRESET=<nombre> -P cmake/configure-preset.cmake
++#
++# Configura el proyecto con un preset de CMakePresets.json y deja una copia de
++# compile_commands.json en la raíz, que es donde lo busca clangd (Zed).
++# Se hace con un script de CMake y no con "cmd1 && cmd2" para que funcione igual
++# en PowerShell, cmd, bash...
++cmake_minimum_required(VERSION 3.21)
++
++if(NOT PRESET)
++  message(FATAL_ERROR "Falta -DPRESET=<nombre de un preset de CMakePresets.json>")
++endif()
++
++get_filename_component(ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
++
++execute_process(
++  COMMAND "${CMAKE_COMMAND}" --preset "${PRESET}"
++  WORKING_DIRECTORY "${ROOT}"
++  COMMAND_ERROR_IS_FATAL ANY)
++
++# Debe coincidir con "binaryDir" de los presets (projects/out/build/${presetName}).
++set(COMPDB "${ROOT}/projects/out/build/${PRESET}/compile_commands.json")
++if(NOT EXISTS "${COMPDB}")
++  message(FATAL_ERROR "No existe ${COMPDB}. ¿Se usa un generador Ninja y CMAKE_EXPORT_COMPILE_COMMANDS=ON?")
++endif()
++
++file(COPY_FILE "${COMPDB}" "${ROOT}/compile_commands.json" ONLY_IF_DIFFERENT)
++message(STATUS "compile_commands.json actualizado desde el preset '${PRESET}'")

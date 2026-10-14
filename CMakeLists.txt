@@ -12,6 +12,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# compile_commands.json para clangd (Zed, VS Code...). Solo lo generan los generadores Ninja/Makefile.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 
 set(CODE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/code)
 

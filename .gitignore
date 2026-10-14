@@ -15,6 +15,10 @@ CMakeFiles/
 cmake_install.cmake
 CMakeUserPresets.json
 
+# clangd (Zed / VS Code): copia generada por cmake/configure-preset.cmake e índice
+/compile_commands.json
+.cache/
+
 # Binarios y objetos
 *.exe
 *.obj

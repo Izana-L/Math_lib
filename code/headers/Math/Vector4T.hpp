@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <cstdint>
 #include <cstddef>
@@ -42,6 +42,82 @@ namespace Math
 		{
 			return Vector3T<Type>(x, y, z);
 		}
+
+		[[nodiscard]] constexpr Vector4T operator-() const noexcept requires (!std::unsigned_integral<Type>)
+		{return Vector2T(-x, -y,-z,-w);}
+		constexpr Vector4T& operator+=(const Vector4T& other_vector) noexcept
+		{
+    		x+=other_vector.x;
+    		y+=other_vector.y;
+            z+=other_vector.z;
+            w+=other_vector.w;
+    		return *this;
+		}
+		constexpr Vector4T& operator-=(const Vector4T& other_vector) noexcept
+		{
+    		x-=other_vector.x;
+    		y-=other_vector.y;
+            z-=other_vector.z;
+            w-=other_vector.w;
+    		return *this;
+		}
+		constexpr Vector4T& operator*=( Type scalar) noexcept
+		{
+    		x*=scalar;
+    		y*=scalar;
+            z*=scalar;
+            w*=scalar;
+    		return *this;
+		}
+		constexpr Vector4T& operator/=( Type scalar) noexcept
+		{
+        	x/=scalar;
+        	y/=scalar;
+            z/=scalar;
+            w/=scalar;
+        	return *this;
+	    }
+
+		[[nodiscard]] friend constexpr Vector4T operator+( Vector4T vector_a, const Vector4T& vector_b) noexcept
+		{ return vector_a+=vector_b; }
+		[[nodiscard]] friend constexpr Vector4T operator-(Vector4T vector_a, const Vector4T& vector_b) noexcept
+		{ return  vector_a-=vector_b; }
+		[[nodiscard]] friend constexpr Vector4T operator*(Vector4T vector, Type scalar) noexcept
+		{ return  vector*=scalar; }
+		[[nodiscard]] friend constexpr Vector4T operator*(Type scalar, Vector4T vector) noexcept
+		{ return  vector*=scalar; }
+		[[nodiscard]] friend constexpr Vector4T operator/(Vector4T vector, Type scalar) noexcept
+		{ return  vector/=scalar; }
+		[[nodiscard]] friend constexpr Vector4T operator*(const Vector4T& vector_a, const Vector4T& vector_b) noexcept
+		{ return Vector4T(vector_a.x*vector_b.x, vector_a.y*vector_b.y, vector_a.z*vector_b.z); }
+		[[nodiscard]] friend constexpr Vector4T operator/(const Vector4T& vector_a, const Vector4T& vector_b) noexcept
+		{ return Vector4T(vector_a.x/vector_b.x, vector_a.y/vector_b.y, vector_a.z/vector_b.z); }
+
+		[[nodiscard]] constexpr Type Dot(const Vector4T vector_a, const Vector4T vector_b) noexcept
+		{
+			return vector_a.x * vector_b.x + vector_a.y * vector_b.y + vector_a.z * vector_b.z + vector_a.w * vector_b.w;
+		}
+
+		[[nodiscard]] constexpr T Length_squared(const Vector4T vector) noexcept
+		{
+			return Dot(vector, vector);
+		}
+		template <std::floating_point Type>
+		[[nodiscard]] Type Length(const Vector4T vector) noexcept
+		{
+			return std::sqrt(Length_squared(vector));
+		}
+
+		[[nodiscard]] constexpr Type Distance_squared(const Vector4T vector_a, const Vector4T vector_b) noexcept
+		{
+			return Length_squared(vector_a - vector_b);
+		}
+		template <std::floating_point Type>
+		[[nodiscard]] Type Distance(const Vector4T vector_a, const Vector4T vector_b) noexcept
+		{
+			return Length(vector_a - vector_b);
+		}
+
 	};
 	using Vector4 = Vector4T<float>;
 	using Vector4i = Vector4T<std::int32_t>;

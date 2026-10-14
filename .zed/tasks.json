@@ -1,0 +1,57 @@
+// Tareas de Zed (command palette: "task: spawn"). Equivalen al selector de
+// configuración de Visual Studio: elige el preset y la acción.
+//
+// - "configurar" ejecuta el preset y copia compile_commands.json a la raíz
+//   (clangd lo usa para el autocompletado). Vuelve a ejecutarlo si cambias de
+//   preset o si añades/quitas archivos .cpp.
+// - Windows: abre Zed desde una "Developer PowerShell for VS" (cl.exe + $env{VSINSTALLDIR}).
+// - WSL: abre la carpeta con "projects: open in wsl" y usa las tareas "WSL".
+[
+  // ---------------- Windows x64-debug ----------------
+  {
+    "label": "Windows x64-debug: configurar",
+    "command": "cmake",
+    "args": ["-DPRESET=x64-debug", "-P", "cmake/configure-preset.cmake"]
+  },
+  {
+    "label": "Windows x64-debug: compilar",
+    "command": "cmake",
+    "args": ["--build", "projects/out/build/x64-debug"]
+  },
+  {
+    "label": "Windows x64-debug: ejecutar Math_tests",
+    "command": "projects\\out\\build\\x64-debug\\Math_tests.exe"
+  },
+
+  // ---------------- Windows x64-release ----------------
+  {
+    "label": "Windows x64-release: configurar",
+    "command": "cmake",
+    "args": ["-DPRESET=x64-release", "-P", "cmake/configure-preset.cmake"]
+  },
+  {
+    "label": "Windows x64-release: compilar",
+    "command": "cmake",
+    "args": ["--build", "projects/out/build/x64-release"]
+  },
+  {
+    "label": "Windows x64-release: ejecutar Math_tests",
+    "command": "projects\\out\\build\\x64-release\\Math_tests.exe"
+  },
+
+  // ---------------- WSL / Linux linux-debug ----------------
+  {
+    "label": "WSL linux-debug: configurar",
+    "command": "cmake",
+    "args": ["-DPRESET=linux-debug", "-P", "cmake/configure-preset.cmake"]
+  },
+  {
+    "label": "WSL linux-debug: compilar",
+    "command": "cmake",
+    "args": ["--build", "projects/out/build/linux-debug"]
+  },
+  {
+    "label": "WSL linux-debug: ejecutar Math_tests",
+    "command": "./projects/out/build/linux-debug/Math_tests"
+  }
+]

@@ -1,9 +1,9 @@
-#pragma once 
+#pragma once
 
 
 #include <Math/Constants.hpp>
 #include <concepts>
-#include <compare>
+#include <compare> // IWYU pragma: keep
 #include <type_traits>
 
 
@@ -20,15 +20,16 @@ namespace Math
 
 		constexpr explicit RadiansT(const Type _value) noexcept : value(_value) {}
 
-		[[nodiscard]]  constexpr bool operator==(const RadiansT<Type>&, const RadiansT<Type>&) noexcept = default;
-		[[nodiscard]]  constexpr auto operator<=>(const RadiansT<Type>&, const RadiansT<Type>&) noexcept = default;
+		[[nodiscard]] friend constexpr bool operator==(const RadiansT&, const RadiansT&) noexcept = default;
+		[[nodiscard]] friend constexpr auto operator<=>(const RadiansT&, const RadiansT&) noexcept = default;
 
-		[[nodiscard]]  constexpr RadiansT operator+(RadiansT a, RadiansT b) noexcept { return RadiansT(a.value + b.value); }
-		[[nodiscard]]  constexpr RadiansT operator-(RadiansT a, RadiansT b) noexcept { return RadiansT(a.value - b.value); }
-		[[nodiscard]]  constexpr RadiansT operator-(RadiansT a) noexcept { return RadiansT(-a.value); }
-		[[nodiscard]]  constexpr RadiansT operator*(RadiansT a, Type scalar) noexcept { return RadiansT(a.value * scalar); }
-		[[nodiscard]]  constexpr RadiansT operator*(Type scalar, RadiansT a) noexcept { return RadiansT(scalar * a.value); }
-		[[nodiscard]]  constexpr RadiansT operator/(RadiansT a, Type scalar) noexcept { return RadiansT(a.value / scalar); }
+
+		[[nodiscard]] friend constexpr RadiansT operator+(RadiansT a, RadiansT b) noexcept { return RadiansT(a.value + b.value); }
+		[[nodiscard]] friend constexpr RadiansT operator-(RadiansT a, RadiansT b) noexcept { return RadiansT(a.value - b.value); }
+		[[nodiscard]] friend constexpr RadiansT operator-(RadiansT a) noexcept { return RadiansT(-a.value); }
+		[[nodiscard]] friend constexpr RadiansT operator*(RadiansT a, Type scalar) noexcept { return RadiansT(a.value * scalar); }
+		[[nodiscard]] friend constexpr RadiansT operator*(Type scalar, RadiansT a) noexcept { return RadiansT(scalar * a.value); }
+		[[nodiscard]] friend constexpr RadiansT operator/(RadiansT a, Type scalar) noexcept { return RadiansT(a.value / scalar); }
 
 		constexpr RadiansT& operator+=(RadiansT other) noexcept { value += other.value; return *this; }
 		constexpr RadiansT& operator-=(RadiansT other) noexcept { value -= other.value; return *this; }
@@ -52,15 +53,16 @@ namespace Math
 
 		constexpr explicit DegreesT(const Type _value) noexcept : value(_value) {}
 
-		[[nodiscard]]  constexpr bool operator==(const DegreesT&, const DegreesT&) noexcept = default;
-		[[nodiscard]]  constexpr auto operator<=>(const DegreesT&, const DegreesT&) noexcept = default;
+		[[nodiscard]] friend constexpr bool operator==(const DegreesT&, const DegreesT&) noexcept = default;
+		[[nodiscard]] friend constexpr auto operator<=>(const DegreesT&, const DegreesT&) noexcept = default;
 
-		[[nodiscard]]  constexpr DegreesT operator+(DegreesT a, DegreesT b) noexcept { return DegreesT(a.value + b.value); }
-		[[nodiscard]]  constexpr DegreesT operator-(DegreesT a, DegreesT b) noexcept { return DegreesT(a.value - b.value); }
-		[[nodiscard]]  constexpr DegreesT operator-(DegreesT a) noexcept { return DegreesT(-a.value); }
-		[[nodiscard]]  constexpr DegreesT operator*(DegreesT a, Type scalar) noexcept { return DegreesT(a.value * scalar); }
-		[[nodiscard]]  constexpr DegreesT operator*(Type scalar, DegreesT a) noexcept { return DegreesT(scalar * a.value); }
-		[[nodiscard]]  constexpr DegreesT operator/(DegreesT a, Type scalar) noexcept { return DegreesT(a.value / scalar); }
+		[[nodiscard]] friend constexpr DegreesT operator+(DegreesT a, DegreesT b) noexcept { return DegreesT(a.value + b.value); }
+		[[nodiscard]] friend constexpr DegreesT operator-(DegreesT a, DegreesT b) noexcept { return DegreesT(a.value - b.value); }
+		[[nodiscard]] friend constexpr DegreesT operator-(DegreesT a) noexcept { return DegreesT(-a.value); }
+		[[nodiscard]] friend constexpr DegreesT operator*(DegreesT a, Type scalar) noexcept { return DegreesT(a.value * scalar); }
+		[[nodiscard]] friend constexpr DegreesT operator*(Type scalar, DegreesT a) noexcept { return DegreesT(scalar * a.value); }
+		[[nodiscard]] friend constexpr DegreesT operator/(DegreesT a, Type scalar) noexcept { return DegreesT(a.value / scalar); }
+
 
 		constexpr DegreesT& operator+=(DegreesT other) noexcept { value += other.value; return *this; }
 		constexpr DegreesT& operator-=(DegreesT other) noexcept { value -= other.value; return *this; }
@@ -76,7 +78,7 @@ namespace Math
 	template <std::floating_point T>
 	[[nodiscard]] constexpr DegreesT<T> To_degrees(RadiansT<T> radians) noexcept { return DegreesT<T>(radians.value * Rad_to_deg_v<T>); }
 	template <std::floating_point T>
-	[[nodiscard]] constexpr RadiansT<T> To_redians(DegreesT<T> radians) noexcept { return RadiansT<T>(radians.value * Deg_to_rad_v<Type>); }
+	[[nodiscard]] constexpr RadiansT<T> To_redians(DegreesT<T> radians) noexcept { return RadiansT<T>(radians.value * Deg_to_rad_v<T>); }
 
 	inline namespace literals
 	{
