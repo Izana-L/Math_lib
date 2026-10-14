@@ -81,32 +81,36 @@ namespace Math
 		[[nodiscard]] friend constexpr Vector2T operator/(const Vector2T& vector_a, const Vector2T& vector_b) noexcept
 		{ return Vector2T(vector_a.x/vector_b.x,vector_a.y/vector_b.y); }
 
-		[[nodiscard]] constexpr Type Dot(const Vector2T vector_a, const Vector2T vector_b) noexcept
-		{
-			return vector_a.x * vector_b.x + vector_a.y * vector_b.y;
-		}
 
-		[[nodiscard]] constexpr T Length_squared(const Vector2T vector) noexcept
-		{
-			return Dot(vector, vector);
-		}
-		template <std::floating_point Type>
-		[[nodiscard]] Type Length(const Vector2T vector) noexcept
-		{
-			return std::sqrt(Length_squared(vector));
-		}
-
-		[[nodiscard]] constexpr Type Distance_squared(const Vector2T vector_a, const Vector2T vector_b) noexcept
-		{
-			return Length_squared(vector_a - vector_b);
-		}
-		template <std::floating_point Type>
-		[[nodiscard]] Type Distance(const Vector2T vector_a, const Vector2T vector_b) noexcept
-		{
-			return Length(vector_a - vector_b);
-		}
 
 	};
+
+	template <typename Type>
+	[[nodiscard]] constexpr Type Dot(const Vector2T<Type> vector_a, const Vector2T<Type> vector_b) noexcept
+	{
+		return vector_a.x * vector_b.x + vector_a.y * vector_b.y;
+	}
+	template <typename Type>
+	[[nodiscard]] constexpr Type Length_squared(const Vector2T<Type> vector) noexcept
+	{
+		return Dot(vector, vector);
+	}
+	template <std::floating_point Type>
+	[[nodiscard]] Type Length(const Vector2T<Type> vector) noexcept
+	{
+		return std::sqrt(Length_squared(vector));
+	}
+	template <typename Type>
+	[[nodiscard]] constexpr Type Distance_squared(const Vector2T<Type> vector_a, const Vector2T<Type> vector_b) noexcept
+	{
+		return Length_squared(vector_a - vector_b);
+	}
+	template <std::floating_point Type>
+	[[nodiscard]] Type Distance(const Vector2T<Type> vector_a, const Vector2T<Type> vector_b) noexcept
+	{
+		return Length(vector_a - vector_b);
+	}
+
 	using Vector2 = Vector2T<float>;
 	using Vector2i = Vector2T<std::int32_t>;
 	using Vector2u = Vector2T<std::uint32_t>;

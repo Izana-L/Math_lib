@@ -45,7 +45,7 @@ namespace Math
 		}
 
 		[[nodiscard]] constexpr Vector3T operator-() const noexcept requires (!std::unsigned_integral<Type>)
-		{return Vector2T(-x, -y,-z);}
+		{return Vector3T(-x, -y,-z);}
 		constexpr Vector3T& operator+=(const Vector3T& other_vector) noexcept
 		{
     		x+=other_vector.x;
@@ -90,32 +90,36 @@ namespace Math
 		[[nodiscard]] friend constexpr Vector3T operator/(const Vector3T& vector_a, const Vector3T& vector_b) noexcept
 		{ return Vector3T(vector_a.x/vector_b.x, vector_a.y/vector_b.y, vector_a.z/vector_b.z); }
 
-		[[nodiscard]] constexpr Type Dot(const Vector3T vector_a, const Vector3T vector_b) noexcept
-		{
-			return vector_a.x * vector_b.x + vector_a.y * vector_b.y + vector_a.z * vector_b.z;
-		}
-
-		[[nodiscard]] constexpr T Length_squared(const Vector3T vector) noexcept
-		{
-			return Dot(vector, vector);
-		}
-		template <std::floating_point Type>
-		[[nodiscard]] Type Length(const Vector3T vector) noexcept
-		{
-			return std::sqrt(Length_squared(vector));
-		}
-
-		[[nodiscard]] constexpr Type Distance_squared(const Vector3T vector_a, const Vector3T vector_b) noexcept
-		{
-			return Length_squared(vector_a - vector_b);
-		}
-		template <std::floating_point Type>
-		[[nodiscard]] Type Distance(const Vector3T vector_a, const Vector3T vector_b) noexcept
-		{
-			return Length(vector_a - vector_b);
-		}
 
 	};
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Type Dot(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
+	{
+		return vector_a.x * vector_b.x + vector_a.y * vector_b.y + vector_a.z * vector_b.z;
+	}
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Type Length_squared(const Vector3T<Type> vector) noexcept
+	{
+		return Dot(vector, vector);
+	}
+	template <std::floating_point Type>
+	[[nodiscard]] Type Length(const Vector3T<Type> vector) noexcept
+	{
+		return std::sqrt(Length_squared(vector));
+	}
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Type Distance_squared(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
+	{
+		return Length_squared(vector_a - vector_b);
+	}
+	template <std::floating_point Type>
+	[[nodiscard]] Type Distance(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
+	{
+		return Length(vector_a - vector_b);
+	}
+
+
+
 	using Vector3 = Vector3T<float>;
 	using Vector3i = Vector3T<std::int32_t>;
 	using Vector3u = Vector3T<std::uint32_t>;

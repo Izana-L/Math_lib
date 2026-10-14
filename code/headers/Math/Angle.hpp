@@ -5,7 +5,7 @@
 #include <concepts>
 #include <compare> // IWYU pragma: keep
 #include <type_traits>
-
+#include <cstddef>
 
 namespace Math
 {
@@ -78,7 +78,7 @@ namespace Math
 	template <std::floating_point T>
 	[[nodiscard]] constexpr DegreesT<T> To_degrees(RadiansT<T> radians) noexcept { return DegreesT<T>(radians.value * Rad_to_deg_v<T>); }
 	template <std::floating_point T>
-	[[nodiscard]] constexpr RadiansT<T> To_redians(DegreesT<T> radians) noexcept { return RadiansT<T>(radians.value * Deg_to_rad_v<T>); }
+	[[nodiscard]] constexpr RadiansT<T> To_radians(DegreesT<T> radians) noexcept { return RadiansT<T>(radians.value * Deg_to_rad_v<T>); }
 
 	inline namespace literals
 	{
