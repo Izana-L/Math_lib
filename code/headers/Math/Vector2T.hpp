@@ -5,6 +5,9 @@
 #include <type_traits>
 #include <concepts>
 #include <cmath>
+#include <optional>
+#include <Math/Scalar.hpp>
+#include <cmath>
 namespace Math
 {
 	template <typename T>
@@ -110,6 +113,53 @@ namespace Math
 	{
 		return Length(vector_a - vector_b);
 	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector2T<Type> Normalize(const Vector2T<Type> vector) noexcept
+	{
+		constexpr Type epsilon = std::numeric_limits<Type>::epsilon();
+		constexpr Type lower_limit = std::numeric_limits<Type>::min() / epsilon;
+		constexpr Type upper_limit = std::numeric_limits<Type>::max() * epsilon;
+
+		const Type length_squared = Length_squared(vector);
+		if (length_squared >= lower_limit && length_squared <= upper_limit)
+		{
+			return vector / std::sqrt(length_squared);
+		}
+
+		const Type largest = std::fmax(std::fabs(vector.x), std::fabs(vector.y));
+		const Vector2T<Type> scaled = vector / largest;
+		return scaled / Length(scaled);
+	}
+
+
+	template <std::floating_point Type>
+	[[nodiscard]] std::optional<Vector2T<Type>> Try_normalize(const Vector2T<Type> vector) noexcept
+	{
+		const Vector2T<Type> result = Normalize(vector);
+		if (std::isfinite(result.x) && std::isfinite(result.y))
+		{
+			return result;
+		}
+		return std::nullopt;
+	}
+	template <std::floating_point Type>
+	[[nodiscard]] Vector2T<Type> Normalize_or(const Vector2T<Type> vector, const Vector2T<Type> fallback) noexcept
+	{
+		return Try_normalize(vector).value_or(fallback);
+	}
+	template <std::floating_point Type>
+	[[nodiscard]] bool Is_normalized(const Vector2T<Type> vector) noexcept
+	{
+		return Equals(Length_squared(vector), Type(1));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] bool Is_normalized(const Vector2T<Type> vector, const Type tolerance) noexcept
+	{
+		return Equals(Length_squared(vector), Type(1), tolerance, Type(0));
+	}
+
 
 	using Vector2 = Vector2T<float>;
 	using Vector2i = Vector2T<std::int32_t>;

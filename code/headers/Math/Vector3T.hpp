@@ -3,6 +3,10 @@
 #include <cstdint>
 #include <cstddef>
 #include <type_traits>
+#include <concepts>
+#include <cmath>
+#include <optional>
+#include <Math/Scalar.hpp>
 #include <Math/Vector2T.hpp>
 
 namespace Math
@@ -92,12 +96,12 @@ namespace Math
 
 
 	};
-	template <std::floating_point Type>
+	template <typename Type>
 	[[nodiscard]] constexpr Type Dot(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
 	{
 		return vector_a.x * vector_b.x + vector_a.y * vector_b.y + vector_a.z * vector_b.z;
 	}
-	template <std::floating_point Type>
+	template <typename Type>
 	[[nodiscard]] constexpr Type Length_squared(const Vector3T<Type> vector) noexcept
 	{
 		return Dot(vector, vector);
@@ -107,7 +111,7 @@ namespace Math
 	{
 		return std::sqrt(Length_squared(vector));
 	}
-	template <std::floating_point Type>
+	template <typename Type>
 	[[nodiscard]] constexpr Type Distance_squared(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
 	{
 		return Length_squared(vector_a - vector_b);
@@ -117,7 +121,51 @@ namespace Math
 	{
 		return Length(vector_a - vector_b);
 	}
+	template <std::floating_point Type>
+	[[nodiscard]] Vector3T<Type> Normalize(const Vector3T<Type> vector) noexcept
+	{
+		constexpr Type epsilon = std::numeric_limits<Type>::epsilon();
+		constexpr Type lower_limit = std::numeric_limits<Type>::min() / epsilon;
+		constexpr Type upper_limit = std::numeric_limits<Type>::max() * epsilon;
 
+		const Type length_squared = Length_squared(vector);
+		if (length_squared >= lower_limit && length_squared <= upper_limit)
+		{
+			return vector / std::sqrt(length_squared);
+		}
+
+		const Type largest = std::fmax(std::fmax(std::fabs(vector.x), std::fabs(vector.y)), std::fabs(vector.z));
+		const Vector3T<Type> scaled = vector / largest;
+		return scaled / Length(scaled);
+	}
+
+
+	template <std::floating_point Type>
+	[[nodiscard]] std::optional<Vector3T<Type>> Try_normalize(const Vector3T<Type> vector) noexcept
+	{
+		const Vector3T<Type> result = Normalize(vector);
+		if (std::isfinite(result.x) && std::isfinite(result.y) && std::isfinite(result.z))
+		{
+			return result;
+		}
+		return std::nullopt;
+	}
+	template <std::floating_point Type>
+	[[nodiscard]] Vector3T<Type> Normalize_or(const Vector3T<Type> vector, const Vector3T<Type> fallback) noexcept
+	{
+		return Try_normalize(vector).value_or(fallback);
+	}
+	template <std::floating_point Type>
+	[[nodiscard]] bool Is_normalized(const Vector3T<Type> vector) noexcept
+	{
+		return Equals(Length_squared(vector), Type(1));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] bool Is_normalized(const Vector3T<Type> vector, const Type tolerance) noexcept
+	{
+		return Equals(Length_squared(vector), Type(1), tolerance, Type(0));
+	}
 
 
 	using Vector3 = Vector3T<float>;
