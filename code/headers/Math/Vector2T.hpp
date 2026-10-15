@@ -7,7 +7,7 @@
 #include <cmath>
 #include <optional>
 #include <Math/Scalar.hpp>
-#include <cmath>
+
 namespace Math
 {
 	template <typename T>
@@ -159,6 +159,118 @@ namespace Math
 	{
 		return Equals(Length_squared(vector), Type(1), tolerance, Type(0));
 	}
+
+	template <typename Type>
+	[[nodiscard]] constexpr Vector2T<Type> Min(const Vector2T<Type> vector_a, const Vector2T<Type> vector_b) noexcept
+	{
+		return  Vector2T<Type>(vector_a.x < vector_b.x ? vector_a.x : vector_b.x,vector_a.y < vector_b.y ? vector_a.y : vector_b.y);
+	}
+	template <typename Type>
+	[[nodiscard]] constexpr Vector2T<Type> Max(const Vector2T<Type> vector_a, const Vector2T<Type> vector_b) noexcept
+	{
+		return Vector2T<Type>(vector_a.x > vector_b.x ? vector_a.x : vector_b.x,vector_a.y > vector_b.y ? vector_a.y : vector_b.y);
+	}
+	template <typename Type>
+	[[nodiscard]] constexpr Vector2T<Type> Clamp(const Vector2T<Type> vector, const Vector2T<Type> lower, const Vector2T<Type> upper) noexcept
+	{
+		return Vector2T<Type>(std::clamp(vector.x, lower.x, upper.x), std::clamp(vector.y, lower.y, upper.y));
+	}
+
+	template <typename Type>
+	[[nodiscard]] constexpr Vector2T<Type> Clamp(const Vector2T<Type> vector, const std::type_identity_t<Type> lower, const std::type_identity_t<Type> upper) noexcept
+	{
+		return Vector2T<Type>(std::clamp(vector.x, lower, upper), std::clamp(vector.y, lower, upper));
+	}
+	template <typename Type>
+	[[nodiscard]] constexpr Type Min_component(const Vector2T<Type> vector) noexcept
+	{
+		return vector.x < vector.y ? vector.x : vector.y;
+	}
+	template <typename Type>
+	[[nodiscard]] constexpr Type Max_component(const Vector2T<Type> vector) noexcept
+	{
+		return vector.x > vector.y ? vector.x : vector.y;
+	}
+
+	template <typename Type>
+	[[nodiscard]] constexpr Vector2T<Type> Clamp(const Vector2T<Type> vector, const Vector2T<Type> lower, const Vector2T<Type> upper) noexcept
+	{
+		return Vector2T<Type>(std::clamp(vector.x, lower.x, upper.x), std::clamp(vector.y, lower.y, upper.y));
+	}
+
+
+	template <typename Type>
+	[[nodiscard]] constexpr Vector2T<Type> Clamp(const Vector2T<Type> vector, const std::type_identity_t<Type> lower, const std::type_identity_t<Type> upper) noexcept
+	{
+		return Vector2T<Type>(std::clamp(vector.x, lower, upper), std::clamp(vector.y, lower, upper));
+	}
+
+
+	template <typename Type>
+	requires (!std::unsigned_integral<Type>)
+	[[nodiscard]] constexpr Vector2T<Type> Abs(const Vector2T<Type> vector) noexcept
+	{
+		return Vector2T<Type>(detail::Abs_of(vector.x), detail::Abs_of(vector.y));
+	}
+
+
+	template <typename Type>
+	[[nodiscard]] constexpr Vector2T<Type> Sign(const Vector2T<Type> vector) noexcept
+	{
+		return Vector2T<Type>(detail::Sign_of(vector.x), detail::Sign_of(vector.y));
+	}
+
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector2T<Type> Saturate(const Vector2T<Type> vector) noexcept
+	{
+		return Vector2T<Type>(Saturate(vector.x), Saturate(vector.y));
+	}
+
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector2T<Type> Floor(const Vector2T<Type> vector) noexcept
+	{
+		return Vector2T<Type>(std::floor(vector.x), std::floor(vector.y));
+	}
+
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector2T<Type> Ceil(const Vector2T<Type> vector) noexcept
+	{
+		return Vector2T<Type>(std::ceil(vector.x), std::ceil(vector.y));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector2T<Type> Fract(const Vector2T<Type> vector) noexcept
+	{
+		return Vector2T<Type>(Repeat(vector.x, Type(1)), Repeat(vector.y, Type(1)));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector2T<Type> Lerp(const Vector2T<Type> from, const Vector2T<Type> to, const std::type_identity_t<Type> factor) noexcept
+	{
+		return Vector2T<Type>(Lerp(from.x, to.x, factor), Lerp(from.y, to.y, factor));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector2T<Type> Lerp(const Vector2T<Type> from, const Vector2T<Type> to, const Vector2T<Type> factor) noexcept
+	{
+		return Vector2T<Type>(Lerp(from.x, to.x, factor.x), Lerp(from.y, to.y, factor.y));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector2T<Type> Smoothstep(const std::type_identity_t<Type> lower_edge, const std::type_identity_t<Type> upper_edge, const Vector2T<Type> value) noexcept
+	{
+		return Vector2T<Type>(Smoothstep(lower_edge, upper_edge, value.x), Smoothstep(lower_edge, upper_edge, value.y));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector2T<Type> Smoothstep(const Vector2T<Type> lower_edge, const Vector2T<Type> upper_edge, const Vector2T<Type> value) noexcept
+	{
+		return Vector2T<Type>(Smoothstep(lower_edge.x, upper_edge.x, value.x), Smoothstep(lower_edge.y, upper_edge.y, value.y));
+	}
+
 
 
 	using Vector2 = Vector2T<float>;

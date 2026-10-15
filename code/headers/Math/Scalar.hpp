@@ -13,6 +13,33 @@ namespace Math
 	{
 		template <std::floating_point T>
 		inline constexpr T Epsilon_scale_v = std::numeric_limits<T>::epsilon() / std::numeric_limits<float>::epsilon();
+
+		template <typename Type>
+		[[nodiscard]] constexpr Type Abs_of(const Type value) noexcept
+		{
+			if constexpr (std::floating_point<Type>)
+			{
+				return std::abs(value);
+			}
+			else
+			{
+				return value < Type(0) ? -value : value;
+			}
+		}
+
+		// -1, 0 o +1 (con tipos sin signo, 0 o 1). Con NaN da 0.
+		template <typename Type>
+		[[nodiscard]] constexpr Type Sign_of(const Type value) noexcept
+		{
+			if constexpr (std::unsigned_integral<Type>)
+			{
+				return value > Type(0) ? Type(1) : Type(0);
+			}
+			else
+			{
+				return static_cast<Type>((Type(0) < value) - (value < Type(0)));
+			}
+		}
 	}
 
 	template <std::floating_point T>

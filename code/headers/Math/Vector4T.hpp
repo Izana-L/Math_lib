@@ -169,6 +169,126 @@ namespace Math
 	{
 		return Equals(Length_squared(vector), Type(1), tolerance, Type(0));
 	}
+
+	template <typename Type>
+	[[nodiscard]] constexpr Vector4T<Type> Min(const Vector4T<Type> vector_a, const Vector4T<Type> vector_b) noexcept
+	{
+		return  Vector4T<Type>(vector_a.x < vector_b.x ? vector_a.x : vector_b.x, vector_a.y < vector_b.y ? vector_a.y : vector_b.y, 
+						       vector_a.z < vector_b.z ? vector_a.z : vector_b.z, vector_a.w < vector_b.w ? vector_a.w : vector_b.w);
+	}
+	template <typename Type>
+	[[nodiscard]] constexpr Vector4T<Type> Max(const Vector4T<Type> vector_a, const Vector4T<Type> vector_b) noexcept
+	{
+		return Vector4T<Type>(vector_a.x > vector_b.x ? vector_a.x : vector_b.x, vector_a.y > vector_b.y ? vector_a.y : vector_b.y, 
+							  vector_a.z > vector_b.z ? vector_a.z : vector_b.z, vector_a.w > vector_b.w ? vector_a.w : vector_b.w);
+	}
+	template <typename Type>
+	[[nodiscard]] constexpr Vector4T<Type> Clamp(const Vector4T<Type> vector, const Vector4T<Type> lower, const Vector4T<Type> upper) noexcept
+	{
+		return Vector4T<Type>(std::clamp(vector.x, lower.x, upper.x), std::clamp(vector.y, lower.y, upper.y), std::clamp(vector.z, lower.z, upper.z), std::clamp(vector.w, lower.w, upper.w));
+	}
+
+	template <typename Type>
+	[[nodiscard]] constexpr Vector4T<Type> Clamp(const Vector4T<Type> vector, const std::type_identity_t<Type> lower, const std::type_identity_t<Type> upper) noexcept
+	{
+		return Vector4T<Type>(std::clamp(vector.x, lower, upper), std::clamp(vector.y, lower, upper), std::clamp(vector.z, lower, upper), std::clamp(vector.w, lower, upper));
+	}
+
+	template <typename Type>
+	[[nodiscard]] constexpr Type Min_component(const Vector4T<Type> vector) noexcept
+	{
+		const Type smallest_xy = vector.x < vector.y ? vector.x : vector.y;
+		const Type smallest_zw = vector.z < vector.w ? vector.z : vector.w;
+		return smallest_xy < smallest_zw ? smallest_xy : smallest_zw;
+	}
+	template <typename Type>
+	[[nodiscard]] constexpr Type Max_component(const Vector4T<Type> vector) noexcept
+	{
+		const Type biggest_xy = vector.x > vector.y ? vector.x : vector.y;
+		const Type biggest_zw = vector.z > vector.w ? vector.z : vector.w;
+		return biggest_xy > biggest_zw ? biggest_xy : biggest_zw;
+	}
+
+	template <typename Type>
+	[[nodiscard]] constexpr Vector4T<Type> Clamp(const Vector4T<Type> vector, const Vector4T<Type> lower, const Vector4T<Type> upper) noexcept
+	{
+		return Vector4T<Type>(std::clamp(vector.x, lower.x, upper.x), std::clamp(vector.y, lower.y, upper.y), std::clamp(vector.z, lower.z, upper.z), std::clamp(vector.w, lower.w, upper.w));
+	}
+
+
+	template <typename Type>
+	[[nodiscard]] constexpr Vector4T<Type> Clamp(const Vector4T<Type> vector, const std::type_identity_t<Type> lower, const std::type_identity_t<Type> upper) noexcept
+	{
+		return Vector4T<Type>(std::clamp(vector.x, lower, upper), std::clamp(vector.y, lower, upper), std::clamp(vector.z, lower, upper), std::clamp(vector.w, lower, upper));
+	}
+
+
+	template <typename Type>
+		requires (!std::unsigned_integral<Type>)
+	[[nodiscard]] constexpr Vector4T<Type> Abs(const Vector4T<Type> vector) noexcept
+	{
+		return Vector4T<Type>(detail::Abs_of(vector.x), detail::Abs_of(vector.y), detail::Abs_of(vector.z), detail::Abs_of(vector.w));
+	}
+
+
+	template <typename Type>
+	[[nodiscard]] constexpr Vector4T<Type> Sign(const Vector4T<Type> vector) noexcept
+	{
+		return Vector4T<Type>(detail::Sign_of(vector.x), detail::Sign_of(vector.y), detail::Sign_of(vector.z), detail::Sign_of(vector.w));
+	}
+
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector4T<Type> Saturate(const Vector4T<Type> vector) noexcept
+	{
+		return Vector4T<Type>(Saturate(vector.x), Saturate(vector.y), Saturate(vector.z), Saturate(vector.w));
+	}
+
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector4T<Type> Floor(const Vector4T<Type> vector) noexcept
+	{
+		return Vector4T<Type>(std::floor(vector.x), std::floor(vector.y), std::floor(vector.z), std::floor(vector.w));
+	}
+
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector4T<Type> Ceil(const Vector4T<Type> vector) noexcept
+	{
+		return Vector4T<Type>(std::ceil(vector.x), std::ceil(vector.y), std::ceil(vector.z), std::ceil(vector.w));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector4T<Type> Fract(const Vector4T<Type> vector) noexcept
+	{
+		return Vector4T<Type>(Repeat(vector.x, Type(1)), Repeat(vector.y, Type(1), Repeat(vector.z, Type(1), Repeat(vector.w, Type(1)));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector4T<Type> Lerp(const Vector4T<Type> from, const Vector4T<Type> to, const std::type_identity_t<Type> factor) noexcept
+	{
+		return Vector4T<Type>(Lerp(from.x, to.x, factor), Lerp(from.y, to.y, factor), Lerp(from.z, to.z, factor), Lerp(from.w, to.w, factor));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector4T<Type> Lerp(const Vector4T<Type> from, const Vector4T<Type> to, const Vector4T<Type> factor) noexcept
+	{
+		return Vector4T<Type>(Lerp(from.x, to.x, factor.x), Lerp(from.y, to.y, factor.y), Lerp(from.z, to.z, factor.z), Lerp(from.w, to.w, factor.w));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector4T<Type> Smoothstep(const std::type_identity_t<Type> lower_edge, const std::type_identity_t<Type> upper_edge, const Vector4T<Type> value) noexcept
+	{
+		return Vector4T<Type>(Smoothstep(lower_edge, upper_edge, value.x), Smoothstep(lower_edge, upper_edge, value.y), Smoothstep(lower_edge, upper_edge, value.z), Smoothstep(lower_edge, upper_edge, value.w));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector4T<Type> Smoothstep(const Vector4T<Type> lower_edge, const Vector4T<Type> upper_edge, const Vector4T<Type> value) noexcept
+	{
+		return Vector4T<Type>(Smoothstep(lower_edge.x, upper_edge.x, value.x), Smoothstep(lower_edge.y, upper_edge.y, value.y), Smoothstep(lower_edge.z, upper_edge.z, value.z), Smoothstep(lower_edge.w, upper_edge.w, value.w));
+	}
+
+
 	using Vector4 = Vector4T<float>;
 	using Vector4i = Vector4T<std::int32_t>;
 	using Vector4u = Vector4T<std::uint32_t>;

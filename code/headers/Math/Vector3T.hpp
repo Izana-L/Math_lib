@@ -167,6 +167,121 @@ namespace Math
 		return Equals(Length_squared(vector), Type(1), tolerance, Type(0));
 	}
 
+	template <typename Type>
+	[[nodiscard]] constexpr Vector3T<Type> Min(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
+	{
+		return  Vector3T<Type>(vector_a.x < vector_b.x ? vector_a.x : vector_b.x, vector_a.y < vector_b.y ? vector_a.y : vector_b.y, vector_a.z < vector_b.z ? vector_a.z : vector_b.z);
+	}
+	template <typename Type>
+	[[nodiscard]] constexpr Vector3T<Type> Max(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
+	{
+		return Vector3T<Type>(vector_a.x > vector_b.x ? vector_a.x : vector_b.x, vector_a.y > vector_b.y ? vector_a.y : vector_b.y : vector_b.z, vector_a.z > vector_b.z ? vector_a.z : vector_b.z);
+	}
+	template <typename Type>
+	[[nodiscard]] constexpr Vector3T<Type> Clamp(const Vector3T<Type> vector, const Vector3T<Type> lower, const Vector3T<Type> upper) noexcept
+	{
+		return Vector3T<Type>(std::clamp(vector.x, lower.x, upper.x), std::clamp(vector.y, lower.y, upper.y), std::clamp(vector.z, lower.z, upper.z));
+	}
+
+	template <typename Type>
+	[[nodiscard]] constexpr Vector3T<Type> Clamp(const Vector3T<Type> vector, const std::type_identity_t<Type> lower, const std::type_identity_t<Type> upper) noexcept
+	{
+		return Vector3T<Type>(std::clamp(vector.x, lower, upper), std::clamp(vector.y, lower, upper), std::clamp(vector.z, lower, upper));
+	}
+
+	template <typename Type>
+	[[nodiscard]] constexpr Type Min_component(const Vector3T<Type> vector) noexcept
+	{
+		const Type smallest_xy = vector.x < vector.y ? vector.x : vector.y;
+		return smallest_xy < vector.z ? smallest_xy : vector.z;
+	}
+	template <typename Type>
+	[[nodiscard]] constexpr Type Max_component(const Vector3T<Type> vector) noexcept
+	{
+		const Type biggest_xy = vector.x > vector.y ? vector.x : vector.y;
+		return biggest_xy > vector.z ? biggest_xy : vector.z;
+	}
+
+	template <typename Type>
+	[[nodiscard]] constexpr Vector3T<Type> Clamp(const Vector3T<Type> vector, const Vector3T<Type> lower, const Vector3T<Type> upper) noexcept
+	{
+		return Vector3T<Type>(std::clamp(vector.x, lower.x, upper.x), std::clamp(vector.y, lower.y, upper.y), std::clamp(vector.z, lower.z, upper.z));
+	}
+
+
+	template <typename Type>
+	[[nodiscard]] constexpr Vector3T<Type> Clamp(const Vector3T<Type> vector, const std::type_identity_t<Type> lower, const std::type_identity_t<Type> upper) noexcept
+	{
+		return Vector3T<Type>(std::clamp(vector.x, lower, upper), std::clamp(vector.y, lower, upper), std::clamp(vector.z, lower, upper));
+	}
+
+
+	template <typename Type>
+		requires (!std::unsigned_integral<Type>)
+	[[nodiscard]] constexpr Vector3T<Type> Abs(const Vector3T<Type> vector) noexcept
+	{
+		return Vector3T<Type>(detail::Abs_of(vector.x), detail::Abs_of(vector.y), detail::Abs_of(vector.z));
+	}
+
+
+	template <typename Type>
+	[[nodiscard]] constexpr Vector3T<Type> Sign(const Vector3T<Type> vector) noexcept
+	{
+		return Vector3T<Type>(detail::Sign_of(vector.x), detail::Sign_of(vector.y), detail::Sign_of(vector.z));
+	}
+
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector3T<Type> Saturate(const Vector3T<Type> vector) noexcept
+	{
+		return Vector3T<Type>(Saturate(vector.x), Saturate(vector.y), Saturate(vector.z));
+	}
+
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector3T<Type> Floor(const Vector3T<Type> vector) noexcept
+	{
+		return Vector3T<Type>(std::floor(vector.x), std::floor(vector.y), std::floor(vector.z));
+	}
+
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector3T<Type> Ceil(const Vector3T<Type> vector) noexcept
+	{
+		return Vector3T<Type>(std::ceil(vector.x), std::ceil(vector.y), std::ceil(vector.z));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector3T<Type> Fract(const Vector3T<Type> vector) noexcept
+	{
+		return Vector3T<Type>(Repeat(vector.x, Type(1)), Repeat(vector.y, Type(1), Repeat(vector.z, Type(1)));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector3T<Type> Lerp(const Vector3T<Type> from, const Vector3T<Type> to, const std::type_identity_t<Type> factor) noexcept
+	{
+		return Vector3T<Type>(Lerp(from.x, to.x, factor), Lerp(from.y, to.y, factor), Lerp(from.z, to.z, factor));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector3T<Type> Lerp(const Vector3T<Type> from, const Vector3T<Type> to, const Vector3T<Type> factor) noexcept
+	{
+		return Vector3T<Type>(Lerp(from.x, to.x, factor.x), Lerp(from.y, to.y, factor.y), Lerp(from.z, to.z, factor.z));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector3T<Type> Smoothstep(const std::type_identity_t<Type> lower_edge, const std::type_identity_t<Type> upper_edge, const Vector3T<Type> value) noexcept
+	{
+		return Vector3T<Type>(Smoothstep(lower_edge, upper_edge, value.x), Smoothstep(lower_edge, upper_edge, value.y), Smoothstep(lower_edge, upper_edge, value.z));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector3T<Type> Smoothstep(const Vector3T<Type> lower_edge, const Vector3T<Type> upper_edge, const Vector3T<Type> value) noexcept
+	{
+		return Vector3T<Type>(Smoothstep(lower_edge.x, upper_edge.x, value.x), Smoothstep(lower_edge.y, upper_edge.y, value.y), Smoothstep(lower_edge.z, upper_edge.z, value.z));
+	}
+
+
 
 	using Vector3 = Vector3T<float>;
 	using Vector3i = Vector3T<std::int32_t>;
