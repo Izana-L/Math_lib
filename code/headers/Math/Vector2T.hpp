@@ -192,18 +192,6 @@ namespace Math
 		return vector.x > vector.y ? vector.x : vector.y;
 	}
 
-	template <typename Type>
-	[[nodiscard]] constexpr Vector2T<Type> Clamp(const Vector2T<Type> vector, const Vector2T<Type> lower, const Vector2T<Type> upper) noexcept
-	{
-		return Vector2T<Type>(std::clamp(vector.x, lower.x, upper.x), std::clamp(vector.y, lower.y, upper.y));
-	}
-
-
-	template <typename Type>
-	[[nodiscard]] constexpr Vector2T<Type> Clamp(const Vector2T<Type> vector, const std::type_identity_t<Type> lower, const std::type_identity_t<Type> upper) noexcept
-	{
-		return Vector2T<Type>(std::clamp(vector.x, lower, upper), std::clamp(vector.y, lower, upper));
-	}
 
 
 	template <typename Type>

@@ -175,7 +175,7 @@ namespace Math
 	template <typename Type>
 	[[nodiscard]] constexpr Vector3T<Type> Max(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
 	{
-		return Vector3T<Type>(vector_a.x > vector_b.x ? vector_a.x : vector_b.x, vector_a.y > vector_b.y ? vector_a.y : vector_b.y : vector_b.z, vector_a.z > vector_b.z ? vector_a.z : vector_b.z);
+		return Vector3T<Type>(vector_a.x > vector_b.x ? vector_a.x : vector_b.x, vector_a.y > vector_b.y ? vector_a.y : vector_b.y, vector_a.z > vector_b.z ? vector_a.z : vector_b.z);
 	}
 	template <typename Type>
 	[[nodiscard]] constexpr Vector3T<Type> Clamp(const Vector3T<Type> vector, const Vector3T<Type> lower, const Vector3T<Type> upper) noexcept
@@ -201,20 +201,6 @@ namespace Math
 		const Type biggest_xy = vector.x > vector.y ? vector.x : vector.y;
 		return biggest_xy > vector.z ? biggest_xy : vector.z;
 	}
-
-	template <typename Type>
-	[[nodiscard]] constexpr Vector3T<Type> Clamp(const Vector3T<Type> vector, const Vector3T<Type> lower, const Vector3T<Type> upper) noexcept
-	{
-		return Vector3T<Type>(std::clamp(vector.x, lower.x, upper.x), std::clamp(vector.y, lower.y, upper.y), std::clamp(vector.z, lower.z, upper.z));
-	}
-
-
-	template <typename Type>
-	[[nodiscard]] constexpr Vector3T<Type> Clamp(const Vector3T<Type> vector, const std::type_identity_t<Type> lower, const std::type_identity_t<Type> upper) noexcept
-	{
-		return Vector3T<Type>(std::clamp(vector.x, lower, upper), std::clamp(vector.y, lower, upper), std::clamp(vector.z, lower, upper));
-	}
-
 
 	template <typename Type>
 		requires (!std::unsigned_integral<Type>)
@@ -254,7 +240,7 @@ namespace Math
 	template <std::floating_point Type>
 	[[nodiscard]] Vector3T<Type> Fract(const Vector3T<Type> vector) noexcept
 	{
-		return Vector3T<Type>(Repeat(vector.x, Type(1)), Repeat(vector.y, Type(1), Repeat(vector.z, Type(1)));
+		return Vector3T<Type>(Repeat(vector.x, Type(1)), Repeat(vector.y, Type(1)), Repeat(vector.z, Type(1)));
 	}
 
 	template <std::floating_point Type>

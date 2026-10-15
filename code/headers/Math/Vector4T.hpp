@@ -210,20 +210,6 @@ namespace Math
 	}
 
 	template <typename Type>
-	[[nodiscard]] constexpr Vector4T<Type> Clamp(const Vector4T<Type> vector, const Vector4T<Type> lower, const Vector4T<Type> upper) noexcept
-	{
-		return Vector4T<Type>(std::clamp(vector.x, lower.x, upper.x), std::clamp(vector.y, lower.y, upper.y), std::clamp(vector.z, lower.z, upper.z), std::clamp(vector.w, lower.w, upper.w));
-	}
-
-
-	template <typename Type>
-	[[nodiscard]] constexpr Vector4T<Type> Clamp(const Vector4T<Type> vector, const std::type_identity_t<Type> lower, const std::type_identity_t<Type> upper) noexcept
-	{
-		return Vector4T<Type>(std::clamp(vector.x, lower, upper), std::clamp(vector.y, lower, upper), std::clamp(vector.z, lower, upper), std::clamp(vector.w, lower, upper));
-	}
-
-
-	template <typename Type>
 		requires (!std::unsigned_integral<Type>)
 	[[nodiscard]] constexpr Vector4T<Type> Abs(const Vector4T<Type> vector) noexcept
 	{
@@ -261,7 +247,7 @@ namespace Math
 	template <std::floating_point Type>
 	[[nodiscard]] Vector4T<Type> Fract(const Vector4T<Type> vector) noexcept
 	{
-		return Vector4T<Type>(Repeat(vector.x, Type(1)), Repeat(vector.y, Type(1), Repeat(vector.z, Type(1), Repeat(vector.w, Type(1)));
+		return Vector4T<Type>(Repeat(vector.x, Type(1)), Repeat(vector.y, Type(1)), Repeat(vector.z, Type(1)), Repeat(vector.w, Type(1)));
 	}
 
 	template <std::floating_point Type>
