@@ -124,7 +124,7 @@ namespace Math
 		return minimum + Repeat(value - minimum, maximum - minimum);
 	}
 	template <std::floating_point T>
-	[[nodiscard]] RadiansT<T> Delta_angle(const RadiansT<T> from, const RadiansT<T> to) noexcept
+	[[nodiscard]] Radians Delta_angle(const Radians from, const Radians to) noexcept
 	{
 		return RadiansT<T>(Repeat(to.value - from.value + Pi_v<T>, Two_pi_v<T>) - Pi_v<T>);
 	}
