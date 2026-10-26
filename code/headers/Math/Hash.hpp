@@ -3,9 +3,9 @@
 
 #include <cstddef>
 #include <functional>
-#include <Math/Vector2T.hpp>
-#include <Math/Vector3T.hpp>
-#include <Math/Vector4T.hpp>
+#include <Math/Vector2.hpp>
+#include <Math/Vector3.hpp>
+#include <Math/Vector4.hpp>
 
 
 namespace Math::detail
@@ -30,7 +30,7 @@ namespace std
 
 			Math::detail::Hash_combine(seed, hasher(vector.x));
 			Math::detail::Hash_combine(seed, hasher(vector.y));
-		
+
 
 			return seed;
 		}

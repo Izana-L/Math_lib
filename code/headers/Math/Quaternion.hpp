@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <cstddef>
 #include <type_traits>
@@ -27,14 +27,8 @@ namespace Math
 
 		[[nodiscard]] constexpr static Quaternion Identity() noexcept { return Quaternion(); }
 
-		[[nodiscard]] constexpr bool operator==(const Quaternion& other_quaternion) const noexcept
-		{
-			return(this->x == other_quaternion.x && this->y == other_quaternion.y && this->z == other_quaternion.z && this->w == other_quaternion.w);
-		}
-		[[nodiscard]] constexpr bool operator!=(const Quaternion& other_quaternion) const noexcept
-		{
-			return(this->x != other_quaternion.x || this->y != other_quaternion.y || this->z != other_quaternion.z || this->w != other_quaternion.w);
-		}
+		[[nodiscard]] friend constexpr bool operator==(const Quaternion& vector, const Quaternion& other_vector)  noexcept = default;
+
 
 	};
 	static_assert(sizeof(Quaternion) == 4 * sizeof(float), "Quaternion must be exactly 4 floats in size");

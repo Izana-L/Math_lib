@@ -1,8 +1,8 @@
-#pragma once 
+#pragma once
 
 #include <cstddef>
 #include <type_traits>
-#include <Math/Vector3T.hpp>
+#include <Math/Vector3.hpp>
 
 namespace Math
 {
@@ -29,15 +29,8 @@ namespace Math
 		[[nodiscard]] constexpr static Matrix3 Identity() noexcept { return Matrix3();}
 
 		[[nodiscard]] constexpr static Matrix3 Zero() noexcept { return Matrix3(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, 0.0f)); }
+		[[nodiscard]] friend constexpr bool operator==(const Matrix3& vector, const Matrix3& other_vector)  noexcept = default;
 
-		[[nodiscard]] constexpr bool operator==(const Matrix3& other_matrix) const noexcept
-		{
-			return(this->columns[0] == other_matrix.columns[0] && this->columns[1] == other_matrix.columns[1] && this->columns[2] == other_matrix.columns[2]);
-		}
-		[[nodiscard]] constexpr bool operator!=(const Matrix3& other_matrix) const noexcept
-		{
-			return(this->columns[0] != other_matrix.columns[0] || this->columns[1] != other_matrix.columns[1] || this->columns[2] != other_matrix.columns[2]);
-		}
 
 	};
 	static_assert(sizeof(Matrix3) == 3 * sizeof(Vector3), "Matrix3 must be exactly 3 Vector3 in size");

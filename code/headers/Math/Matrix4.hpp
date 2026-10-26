@@ -1,8 +1,8 @@
-#pragma once 
+#pragma once
 
 #include <cstddef>
 #include <type_traits>
-#include <Math/Vector4T.hpp>
+#include <Math/Vector4.hpp>
 
 namespace Math
 {
@@ -11,9 +11,9 @@ namespace Math
 		Vector4 columns[4];
 
 
-		constexpr Matrix4() noexcept : Matrix4(Vector4(1.0f, 0.0f, 0.0f, 0.0f), 
-											   Vector4(0.0f, 1.0f, 0.0f, 0.0f), 
-											   Vector4(0.0f, 0.0f, 1.0f, 0.0f), 
+		constexpr Matrix4() noexcept : Matrix4(Vector4(1.0f, 0.0f, 0.0f, 0.0f),
+											   Vector4(0.0f, 1.0f, 0.0f, 0.0f),
+											   Vector4(0.0f, 0.0f, 1.0f, 0.0f),
 											   Vector4(0.0f, 0.0f, 0.0f, 1.0f)) {}
 
 		constexpr Matrix4(Vector4 _column0, Vector4 _column1, Vector4 _column2, Vector4 _column3) noexcept : columns{ _column0, _column1, _column2,_column3 } {}
@@ -31,19 +31,13 @@ namespace Math
 
 		[[nodiscard]] constexpr static Matrix4 Identity() noexcept { return Matrix4(); }
 
-		[[nodiscard]] constexpr static Matrix4 Zero() noexcept { return Matrix4(Vector4(0.0f, 0.0f, 0.0f, 0.0f), 
-																	            Vector4(0.0f, 0.0f, 0.0f, 0.0f), 
-																				Vector4(0.0f, 0.0f, 0.0f, 0.0f), 
+		[[nodiscard]] constexpr static Matrix4 Zero() noexcept { return Matrix4(Vector4(0.0f, 0.0f, 0.0f, 0.0f),
+																	            Vector4(0.0f, 0.0f, 0.0f, 0.0f),
+																				Vector4(0.0f, 0.0f, 0.0f, 0.0f),
 																				Vector4(0.0f, 0.0f, 0.0f, 0.0f));}
 
-		[[nodiscard]] constexpr bool operator==(const Matrix4& other_matrix) const noexcept
-		{
-			return(this->columns[0] == other_matrix.columns[0] && this->columns[1] == other_matrix.columns[1] && this->columns[2] == other_matrix.columns[2] && this->columns[3] == other_matrix.columns[3]);
-		}
-		[[nodiscard]] constexpr bool operator!=(const Matrix4& other_matrix) const noexcept
-		{
-			return(this->columns[0] != other_matrix.columns[0] || this->columns[1] != other_matrix.columns[1] || this->columns[2] != other_matrix.columns[2] || this->columns[3] != other_matrix.columns[3]);
-		}
+		[[nodiscard]] friend constexpr bool operator==(const Matrix4& vector, const Matrix4& other_vector)  noexcept = default;
+
 
 	};
 	static_assert(sizeof(Matrix4) == 4 * sizeof(Vector4), "Matrix4 must be exactly 4 Vector4 in size");

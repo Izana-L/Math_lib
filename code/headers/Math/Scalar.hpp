@@ -123,10 +123,11 @@ namespace Math
 	{
 		return minimum + Repeat(value - minimum, maximum - minimum);
 	}
-	template <std::floating_point T>
-	[[nodiscard]] Radians Delta_angle(const Radians from, const Radians to) noexcept
+
+	[[nodiscard]] inline Radians Delta_angle(const Radians from, const Radians to) noexcept
 	{
-		return RadiansT<T>(Repeat(to.value - from.value + Pi_v<T>, Two_pi_v<T>) - Pi_v<T>);
+	    const float r = Repeat(to.value - from.value, Two_pi);
+		return r > Pi ? Radians(r - Two_pi) : Radians(r);
 	}
 
 	template <std::floating_point T>

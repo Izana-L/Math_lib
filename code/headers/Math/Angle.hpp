@@ -2,16 +2,12 @@
 
 
 #include <Math/Constants.hpp>
-#include <concepts>
 #include <compare> // IWYU pragma: keep
 #include <type_traits>
 #include <cstddef>
 
 namespace Math
 {
-
-
-
     struct Radians;
 
 	struct Degrees
@@ -20,7 +16,7 @@ namespace Math
 		float value;
 
 		constexpr Degrees() noexcept :value(0.0f) {}
-		constexpr Degrees(const Radians _rad);
+		constexpr explicit Degrees(const Radians _rad) noexcept;
 		constexpr explicit Degrees(const float _value) noexcept : value(_value) {}
 
 		[[nodiscard]] friend constexpr bool operator==(const Degrees&, const Degrees&) noexcept = default;
@@ -47,14 +43,12 @@ namespace Math
 
 	struct Radians
 	{
-
-
 		float value;
 
 		constexpr Radians() noexcept :value(0.0f){}
 
-		constexpr explicit Radians(const float _value) noexcept : value(_value * Deg_to_rad) {}
-		constexpr Radians(const Degrees _degrees) noexcept : value(_degrees.value) {}
+		constexpr explicit Radians(const float _value) noexcept : value(_value ) {}
+		constexpr Radians(const Degrees _degrees) noexcept : value(_degrees.value * Deg_to_rad) {}
 		[[nodiscard]] friend constexpr bool operator==(const Radians&, const Radians&) noexcept = default;
 		[[nodiscard]] friend constexpr auto operator<=>(const Radians&, const Radians&) noexcept = default;
 
@@ -78,7 +72,7 @@ namespace Math
 	static_assert(offsetof(Radians, value) == 0, "value must be at offset 0");
 
 
-	constexpr Degrees::Degrees(const Radians _rad) : value(_rad.value * Rad_to_deg){}
+	constexpr Degrees::Degrees(const Radians _rad) noexcept : value(_rad.value * Rad_to_deg){}
 
 
 	inline namespace literals

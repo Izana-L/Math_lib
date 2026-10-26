@@ -7,7 +7,7 @@
 #include <cmath>
 #include <optional>
 #include <Math/Scalar.hpp>
-#include <Math/Vector2T.hpp>
+#include <Math/Vector2.hpp>
 
 namespace Math
 {
@@ -35,14 +35,7 @@ namespace Math
 		[[nodiscard]] constexpr Type* Data() noexcept { return &x; }
 		[[nodiscard]] constexpr const Type* Data() const noexcept { return &x; }
 
-		[[nodiscard]] constexpr bool operator==(const Vector3T<Type>& other_vector) const noexcept
-		{
-			return(this->x == other_vector.x && this->y == other_vector.y && this->z == other_vector.z);
-		}
-		[[nodiscard]] constexpr bool operator!=(const Vector3T<Type>& other_vector) const noexcept
-		{
-			return(this->x != other_vector.x || this->y != other_vector.y || this->z != other_vector.z);
-		}
+		[[nodiscard]] friend constexpr bool operator==(const Vector3T<Type>& vector, const Vector3T<Type>& other_vector)  noexcept = default;
 		[[nodiscard]] constexpr Vector2T<Type> Xy() const noexcept
 		{
 			return Vector2T<Type>(x,y);
@@ -50,28 +43,28 @@ namespace Math
 
 		[[nodiscard]] constexpr Vector3T operator-() const noexcept requires (!std::unsigned_integral<Type>)
 		{return Vector3T(-x, -y,-z);}
-		constexpr Vector3T& operator+=(const Vector3T& other_vector) noexcept
+		constexpr Vector3T& operator+=(const Vector3T other_vector) noexcept
 		{
     		x+=other_vector.x;
     		y+=other_vector.y;
             z+=other_vector.z;
     		return *this;
 		}
-		constexpr Vector3T& operator-=(const Vector3T& other_vector) noexcept
+		constexpr Vector3T& operator-=(const Vector3T other_vector) noexcept
 		{
     		x-=other_vector.x;
     		y-=other_vector.y;
             z-=other_vector.z;
     		return *this;
 		}
-		constexpr Vector3T& operator*=( Type scalar) noexcept
+		constexpr Vector3T& operator*=(const Type scalar) noexcept
 		{
     		x*=scalar;
     		y*=scalar;
             z*=scalar;
     		return *this;
 		}
-		constexpr Vector3T& operator/=( Type scalar) noexcept
+		constexpr Vector3T& operator/=(const Type scalar) noexcept
 		{
         	x/=scalar;
         	y/=scalar;
@@ -79,19 +72,19 @@ namespace Math
         	return *this;
 	    }
 
-		[[nodiscard]] friend constexpr Vector3T operator+( Vector3T vector_a, const Vector3T& vector_b) noexcept
+		[[nodiscard]] friend constexpr Vector3T operator+( Vector3T vector_a, const Vector3T vector_b) noexcept
 		{ return vector_a+=vector_b; }
-		[[nodiscard]] friend constexpr Vector3T operator-(Vector3T vector_a, const Vector3T& vector_b) noexcept
+		[[nodiscard]] friend constexpr Vector3T operator-(Vector3T vector_a, const Vector3T vector_b) noexcept
 		{ return  vector_a-=vector_b; }
-		[[nodiscard]] friend constexpr Vector3T operator*(Vector3T vector, Type scalar) noexcept
+		[[nodiscard]] friend constexpr Vector3T operator*(Vector3T vector, const Type scalar) noexcept
 		{ return  vector*=scalar; }
-		[[nodiscard]] friend constexpr Vector3T operator*(Type scalar, Vector3T vector) noexcept
+		[[nodiscard]] friend constexpr Vector3T operator*(const Type scalar, Vector3T vector) noexcept
 		{ return  vector*=scalar; }
-		[[nodiscard]] friend constexpr Vector3T operator/(Vector3T vector, Type scalar) noexcept
+		[[nodiscard]] friend constexpr Vector3T operator/(Vector3T vector,const Type scalar) noexcept
 		{ return  vector/=scalar; }
-		[[nodiscard]] friend constexpr Vector3T operator*(const Vector3T& vector_a, const Vector3T& vector_b) noexcept
+		[[nodiscard]] friend constexpr Vector3T operator*(const Vector3T vector_a, const Vector3T vector_b) noexcept
 		{ return Vector3T(vector_a.x*vector_b.x, vector_a.y*vector_b.y, vector_a.z*vector_b.z); }
-		[[nodiscard]] friend constexpr Vector3T operator/(const Vector3T& vector_a, const Vector3T& vector_b) noexcept
+		[[nodiscard]] friend constexpr Vector3T operator/(const Vector3T vector_a, const Vector3T vector_b) noexcept
 		{ return Vector3T(vector_a.x/vector_b.x, vector_a.y/vector_b.y, vector_a.z/vector_b.z); }
 
 

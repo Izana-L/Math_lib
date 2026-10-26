@@ -33,45 +33,38 @@ namespace Math
 		[[nodiscard]] constexpr Type* Data() noexcept { return &x; }
 		[[nodiscard]] constexpr const Type* Data() const noexcept { return &x; }
 
-		[[nodiscard]] constexpr bool operator==(const Vector2T<Type>& other_vector) const noexcept
-		{
-			return(this->x == other_vector.x && this->y == other_vector.y );
-		}
-		[[nodiscard]] constexpr bool operator!=(const Vector2T<Type>& other_vector) const noexcept
-		{
-			return(this->x != other_vector.x || this->y != other_vector.y );
-		}
+		[[nodiscard]] friend constexpr bool operator==(const Vector2T<Type>& vector, const Vector2T<Type>& other_vector)  noexcept = default;
 
 		[[nodiscard]] constexpr Vector2T operator-() const noexcept requires (!std::unsigned_integral<Type>)
 		{return Vector2T(-x, -y);}
-		constexpr Vector2T& operator+=(const Vector2T& other_vector) noexcept
+		constexpr Vector2T& operator+=(const Vector2T other_vector) noexcept
 		{
     		x+=other_vector.x;
     		y+=other_vector.y;
     		return *this;
 		}
-		constexpr Vector2T& operator-=(const Vector2T& other_vector) noexcept
+		constexpr Vector2T& operator-=(const Vector2T other_vector) noexcept
 		{
     		x-=other_vector.x;
     		y-=other_vector.y;
     		return *this;
 		}
-		constexpr Vector2T& operator*=( Type scalar) noexcept
+		constexpr Vector2T& operator*=( const Type& scalar) noexcept
 		{
     		x*=scalar;
     		y*=scalar;
     		return *this;
 		}
-		constexpr Vector2T& operator/=( Type scalar) noexcept
+		constexpr Vector2T& operator/=( const Type& scalar) noexcept
 		{
         	x/=scalar;
         	y/=scalar;
         	return *this;
 	    }
 
-		[[nodiscard]] friend constexpr Vector2T operator+( Vector2T vector_a, const Vector2T& vector_b) noexcept
+		[[nodiscard]] friend constexpr Vector2T operator+( Vector2T vector_a, const Vector2T vector_b) noexcept
 		{ return vector_a+=vector_b; }
-		[[nodiscard]] friend constexpr Vector2T operator-(Vector2T vector_a, const Vector2T& vector_b) noexcept
+		[[nodiscard]] friend constexpr Vector2T operator-(Vector2T vector_a, const Vector2T vector_b) noexcept
 		{ return  vector_a-=vector_b; }
 		[[nodiscard]] friend constexpr Vector2T operator*(Vector2T vector, Type scalar) noexcept
 		{ return  vector*=scalar; }
@@ -79,9 +72,9 @@ namespace Math
 		{ return  vector*=scalar; }
 		[[nodiscard]] friend constexpr Vector2T operator/(Vector2T vector, Type scalar) noexcept
 		{ return  vector/=scalar; }
-		[[nodiscard]] friend constexpr Vector2T operator*(const Vector2T& vector_a, const Vector2T& vector_b) noexcept
+		[[nodiscard]] friend constexpr Vector2T operator*(const Vector2T vector_a, const Vector2T vector_b) noexcept
 		{ return Vector2T(vector_a.x*vector_b.x,vector_a.y*vector_b.y); }
-		[[nodiscard]] friend constexpr Vector2T operator/(const Vector2T& vector_a, const Vector2T& vector_b) noexcept
+		[[nodiscard]] friend constexpr Vector2T operator/(const Vector2T vector_a, const Vector2T vector_b) noexcept
 		{ return Vector2T(vector_a.x/vector_b.x,vector_a.y/vector_b.y); }
 
 

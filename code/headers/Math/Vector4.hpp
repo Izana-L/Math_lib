@@ -7,7 +7,7 @@
 #include <cmath>
 #include <optional>
 #include <Math/Scalar.hpp>
-#include <Math/Vector3T.hpp>
+#include <Math/Vector3.hpp>
 
 namespace Math
 {
@@ -35,14 +35,8 @@ namespace Math
 		[[nodiscard]] constexpr Type* Data() noexcept { return &x; }
 		[[nodiscard]] constexpr const Type* Data() const noexcept { return &x; }
 
-		[[nodiscard]] constexpr bool operator==(const Vector4T<Type>& other_vector) const noexcept
-		{
-			return(this->x == other_vector.x && this->y == other_vector.y && this->z == other_vector.z && this->w == other_vector.w);
-		}
-		[[nodiscard]] constexpr bool operator!=(const Vector4T<Type>& other_vector) const noexcept
-		{
-			return(this->x != other_vector.x || this->y != other_vector.y || this->z != other_vector.z || this->w != other_vector.w);
-		}
+		[[nodiscard]] friend constexpr bool operator==(const Vector4T<Type>& vector, const Vector4T<Type>& other_vector)  noexcept = default;
+
 		[[nodiscard]] constexpr Vector3T<Type> Xyz() const noexcept
 		{
 			return Vector3T<Type>(x, y, z);
@@ -50,7 +44,7 @@ namespace Math
 
 		[[nodiscard]] constexpr Vector4T operator-() const noexcept requires (!std::unsigned_integral<Type>)
 		{return Vector4T(-x, -y,-z,-w);}
-		constexpr Vector4T& operator+=(const Vector4T& other_vector) noexcept
+		constexpr Vector4T& operator+=(const Vector4T other_vector) noexcept
 		{
     		x+=other_vector.x;
     		y+=other_vector.y;
@@ -58,7 +52,7 @@ namespace Math
             w+=other_vector.w;
     		return *this;
 		}
-		constexpr Vector4T& operator-=(const Vector4T& other_vector) noexcept
+		constexpr Vector4T& operator-=(const Vector4T other_vector) noexcept
 		{
     		x-=other_vector.x;
     		y-=other_vector.y;
@@ -66,7 +60,7 @@ namespace Math
             w-=other_vector.w;
     		return *this;
 		}
-		constexpr Vector4T& operator*=( Type scalar) noexcept
+		constexpr Vector4T& operator*=( const Type scalar) noexcept
 		{
     		x*=scalar;
     		y*=scalar;
@@ -74,7 +68,7 @@ namespace Math
             w*=scalar;
     		return *this;
 		}
-		constexpr Vector4T& operator/=( Type scalar) noexcept
+		constexpr Vector4T& operator/=( const Type scalar) noexcept
 		{
         	x/=scalar;
         	y/=scalar;
@@ -83,19 +77,19 @@ namespace Math
         	return *this;
 	    }
 
-		[[nodiscard]] friend constexpr Vector4T operator+( Vector4T vector_a, const Vector4T& vector_b) noexcept
+		[[nodiscard]] friend constexpr Vector4T operator+( Vector4T vector_a, const Vector4T vector_b) noexcept
 		{ return vector_a+=vector_b; }
-		[[nodiscard]] friend constexpr Vector4T operator-(Vector4T vector_a, const Vector4T& vector_b) noexcept
+		[[nodiscard]] friend constexpr Vector4T operator-(Vector4T vector_a, const Vector4T vector_b) noexcept
 		{ return  vector_a-=vector_b; }
-		[[nodiscard]] friend constexpr Vector4T operator*(Vector4T vector, Type scalar) noexcept
+		[[nodiscard]] friend constexpr Vector4T operator*(Vector4T vector, const Type scalar) noexcept
 		{ return  vector*=scalar; }
-		[[nodiscard]] friend constexpr Vector4T operator*(Type scalar, Vector4T vector) noexcept
+		[[nodiscard]] friend constexpr Vector4T operator*(const Type scalar, Vector4T vector) noexcept
 		{ return  vector*=scalar; }
-		[[nodiscard]] friend constexpr Vector4T operator/(Vector4T vector, Type scalar) noexcept
+		[[nodiscard]] friend constexpr Vector4T operator/(Vector4T vector,const Type scalar) noexcept
 		{ return  vector/=scalar; }
-		[[nodiscard]] friend constexpr Vector4T operator*(const Vector4T& vector_a, const Vector4T& vector_b) noexcept
+		[[nodiscard]] friend constexpr Vector4T operator*(const Vector4T vector_a, const Vector4T vector_b) noexcept
 		{ return Vector4T(vector_a.x*vector_b.x, vector_a.y*vector_b.y, vector_a.z*vector_b.z, vector_a.w*vector_b.w); }
-		[[nodiscard]] friend constexpr Vector4T operator/(const Vector4T& vector_a, const Vector4T& vector_b) noexcept
+		[[nodiscard]] friend constexpr Vector4T operator/(const Vector4T vector_a, const Vector4T vector_b) noexcept
 		{ return Vector4T(vector_a.x/vector_b.x, vector_a.y/vector_b.y, vector_a.z/vector_b.z, vector_a.w/vector_b.w); }
 	};
 
@@ -173,13 +167,13 @@ namespace Math
 	template <typename Type>
 	[[nodiscard]] constexpr Vector4T<Type> Min(const Vector4T<Type> vector_a, const Vector4T<Type> vector_b) noexcept
 	{
-		return  Vector4T<Type>(vector_a.x < vector_b.x ? vector_a.x : vector_b.x, vector_a.y < vector_b.y ? vector_a.y : vector_b.y, 
+		return  Vector4T<Type>(vector_a.x < vector_b.x ? vector_a.x : vector_b.x, vector_a.y < vector_b.y ? vector_a.y : vector_b.y,
 						       vector_a.z < vector_b.z ? vector_a.z : vector_b.z, vector_a.w < vector_b.w ? vector_a.w : vector_b.w);
 	}
 	template <typename Type>
 	[[nodiscard]] constexpr Vector4T<Type> Max(const Vector4T<Type> vector_a, const Vector4T<Type> vector_b) noexcept
 	{
-		return Vector4T<Type>(vector_a.x > vector_b.x ? vector_a.x : vector_b.x, vector_a.y > vector_b.y ? vector_a.y : vector_b.y, 
+		return Vector4T<Type>(vector_a.x > vector_b.x ? vector_a.x : vector_b.x, vector_a.y > vector_b.y ? vector_a.y : vector_b.y,
 							  vector_a.z > vector_b.z ? vector_a.z : vector_b.z, vector_a.w > vector_b.w ? vector_a.w : vector_b.w);
 	}
 	template <typename Type>
