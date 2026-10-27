@@ -6,6 +6,7 @@
 #include <concepts>
 #include <cmath>
 #include <optional>
+#include <cassert>
 #include <Math/Scalar.hpp>
 #include <Math/Vector2.hpp>
 
@@ -26,6 +27,7 @@ namespace Math
 
 		[[nodiscard]] constexpr Type& operator[](std::size_t index) noexcept
 		{
+		     assert(index >= 3 && "[]: Out sides the bounds");
 			return index == 0 ? x : index == 1 ? y : z;
 		}
 		[[nodiscard]] constexpr const Type& operator[](std::size_t index) const noexcept
@@ -115,8 +117,15 @@ namespace Math
 		return Length(vector_a - vector_b);
 	}
 	template <std::floating_point Type>
+	[[nodiscard]] bool Is_normalizable(const Vector3T<Type> vector) noexcept
+	{
+		return std::isfinite(vector.x) && std::isfinite(vector.y) && std::isfinite(vector.z) && (vector.x != 0 ||vector.y != 0 |vector.z != 0 );
+	}
+	template <std::floating_point Type>
 	[[nodiscard]] Vector3T<Type> Normalize(const Vector3T<Type> vector) noexcept
 	{
+	    assert(!Is_normalizable(vector) && "Normalize: cannot normalize a zero vector or infinites values");
+
 		constexpr Type epsilon = std::numeric_limits<Type>::epsilon();
 		constexpr Type lower_limit = std::numeric_limits<Type>::min() / epsilon;
 		constexpr Type upper_limit = std::numeric_limits<Type>::max() * epsilon;
@@ -136,12 +145,11 @@ namespace Math
 	template <std::floating_point Type>
 	[[nodiscard]] std::optional<Vector3T<Type>> Try_normalize(const Vector3T<Type> vector) noexcept
 	{
-		const Vector3T<Type> result = Normalize(vector);
-		if (std::isfinite(result.x) && std::isfinite(result.y) && std::isfinite(result.z))
-		{
-			return result;
+	    if (!Is_normalizable(vector))
+	    {
+			return std::nullopt;
 		}
-		return std::nullopt;
+		return Normalize(vector);
 	}
 	template <std::floating_point Type>
 	[[nodiscard]] Vector3T<Type> Normalize_or(const Vector3T<Type> vector, const Vector3T<Type> fallback) noexcept
@@ -173,12 +181,14 @@ namespace Math
 	template <typename Type>
 	[[nodiscard]] constexpr Vector3T<Type> Clamp(const Vector3T<Type> vector, const Vector3T<Type> lower, const Vector3T<Type> upper) noexcept
 	{
+	    assert(lower.x <= upper.x && lower.y <= upper.y && lower.z <= upper.z && "Clamp: 'lower' must be less than or equal to 'upper' in every component");
 		return Vector3T<Type>(std::clamp(vector.x, lower.x, upper.x), std::clamp(vector.y, lower.y, upper.y), std::clamp(vector.z, lower.z, upper.z));
 	}
 
 	template <typename Type>
 	[[nodiscard]] constexpr Vector3T<Type> Clamp(const Vector3T<Type> vector, const std::type_identity_t<Type> lower, const std::type_identity_t<Type> upper) noexcept
 	{
+	    assert( lower <= upper && "Clamp: 'lower' must be less than or equal to 'upper' in every component");
 		return Vector3T<Type>(std::clamp(vector.x, lower, upper), std::clamp(vector.y, lower, upper), std::clamp(vector.z, lower, upper));
 	}
 
@@ -196,7 +206,7 @@ namespace Math
 	}
 
 	template <typename Type>
-		requires (!std::unsigned_integral<Type>)
+	requires (!std::unsigned_integral<Type>)
 	[[nodiscard]] constexpr Vector3T<Type> Abs(const Vector3T<Type> vector) noexcept
 	{
 		return Vector3T<Type>(detail::Abs_of(vector.x), detail::Abs_of(vector.y), detail::Abs_of(vector.z));
@@ -233,7 +243,7 @@ namespace Math
 	template <std::floating_point Type>
 	[[nodiscard]] Vector3T<Type> Fract(const Vector3T<Type> vector) noexcept
 	{
-		return Vector3T<Type>(Repeat(vector.x, Type(1)), Repeat(vector.y, Type(1)), Repeat(vector.z, Type(1)));
+		return Vector3T<Type>(Fract_(vector.x), Fract_(vector.y), Fract_(vector.z));
 	}
 
 	template <std::floating_point Type>

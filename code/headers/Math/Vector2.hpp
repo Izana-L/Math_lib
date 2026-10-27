@@ -6,6 +6,7 @@
 #include <concepts>
 #include <cmath>
 #include <optional>
+#include <cassert>
 #include <Math/Scalar.hpp>
 
 namespace Math
@@ -24,6 +25,7 @@ namespace Math
 
 		[[nodiscard]] constexpr Type& operator[](std::size_t index) noexcept
 		{
+		    assert(index >= 2 && "[]: Out sides the bounds");
 			return index == 0 ? x : y;
 		}
 		[[nodiscard]] constexpr const Type& operator[](std::size_t index) const noexcept
@@ -106,10 +108,15 @@ namespace Math
 	{
 		return Length(vector_a - vector_b);
 	}
-
+	template <std::floating_point Type>
+	[[nodiscard]] bool Is_normalizable(const Vector2T<Type> vector) noexcept
+	{
+		return std::isfinite(vector.x) && std::isfinite(vector.y) && (vector.x != 0 ||vector.y != 0 );
+	}
 	template <std::floating_point Type>
 	[[nodiscard]] Vector2T<Type> Normalize(const Vector2T<Type> vector) noexcept
 	{
+	    assert(!Is_normalizable(vector) && "Normalize: cannot normalize a zero vector or infinites values");
 		constexpr Type epsilon = std::numeric_limits<Type>::epsilon();
 		constexpr Type lower_limit = std::numeric_limits<Type>::min() / epsilon;
 		constexpr Type upper_limit = std::numeric_limits<Type>::max() * epsilon;
@@ -129,16 +136,16 @@ namespace Math
 	template <std::floating_point Type>
 	[[nodiscard]] std::optional<Vector2T<Type>> Try_normalize(const Vector2T<Type> vector) noexcept
 	{
-		const Vector2T<Type> result = Normalize(vector);
-		if (std::isfinite(result.x) && std::isfinite(result.y))
-		{
-			return result;
-		}
-		return std::nullopt;
+        if (!Is_normalizable(vector))
+        {
+        	return std::nullopt;
+        }
+		return Normalize(vector);
 	}
 	template <std::floating_point Type>
 	[[nodiscard]] Vector2T<Type> Normalize_or(const Vector2T<Type> vector, const Vector2T<Type> fallback) noexcept
 	{
+
 		return Try_normalize(vector).value_or(fallback);
 	}
 	template <std::floating_point Type>
@@ -166,12 +173,14 @@ namespace Math
 	template <typename Type>
 	[[nodiscard]] constexpr Vector2T<Type> Clamp(const Vector2T<Type> vector, const Vector2T<Type> lower, const Vector2T<Type> upper) noexcept
 	{
+	    assert(lower.x <= upper.x && lower.y <= upper.y && "Clamp: 'lower' must be less than or equal to 'upper' in every component");
 		return Vector2T<Type>(std::clamp(vector.x, lower.x, upper.x), std::clamp(vector.y, lower.y, upper.y));
 	}
 
 	template <typename Type>
 	[[nodiscard]] constexpr Vector2T<Type> Clamp(const Vector2T<Type> vector, const std::type_identity_t<Type> lower, const std::type_identity_t<Type> upper) noexcept
 	{
+	    assert( lower <= upper && "Clamp: 'lower' must be less than or equal to 'upper' in every component");
 		return Vector2T<Type>(std::clamp(vector.x, lower, upper), std::clamp(vector.y, lower, upper));
 	}
 	template <typename Type>
@@ -185,7 +194,11 @@ namespace Math
 		return vector.x > vector.y ? vector.x : vector.y;
 	}
 
-
+	template <std::floating_point Type>
+	[[nodiscard]] Vector2T<Type> Fract(const Vector2T<Type> vector) noexcept
+	{
+		return Vector2T<Type>(Fract_(vector.x), Fract_(vector.y));
+	}
 
 	template <typename Type>
 	requires (!std::unsigned_integral<Type>)
@@ -222,11 +235,6 @@ namespace Math
 		return Vector2T<Type>(std::ceil(vector.x), std::ceil(vector.y));
 	}
 
-	template <std::floating_point Type>
-	[[nodiscard]] Vector2T<Type> Fract(const Vector2T<Type> vector) noexcept
-	{
-		return Vector2T<Type>(Repeat(vector.x, Type(1)), Repeat(vector.y, Type(1)));
-	}
 
 	template <std::floating_point Type>
 	[[nodiscard]] constexpr Vector2T<Type> Lerp(const Vector2T<Type> from, const Vector2T<Type> to, const std::type_identity_t<Type> factor) noexcept

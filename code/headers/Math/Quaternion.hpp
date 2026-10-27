@@ -34,7 +34,7 @@ namespace Math
 	static_assert(sizeof(Quaternion) == 4 * sizeof(float), "Quaternion must be exactly 4 floats in size");
 	static_assert(alignof(Quaternion) == alignof(float), "Quaternion must not be aligned more strictly than a float");
 	static_assert(std::is_standard_layout_v<Quaternion>, "Quaternion must be standard_layout");
-	static_assert(std::is_trivially_copyable_v<Quaternion>, "Quaternio  must be trivially_copyable");
+	static_assert(std::is_trivially_copyable_v<Quaternion>, "Quaternion  must be trivially_copyable");
 	static_assert(offsetof(Quaternion, x) == 0, "x must be at offset 0");
 	static_assert(offsetof(Quaternion, y) == sizeof(float), "y must follow x");
 	static_assert(offsetof(Quaternion, z) == 2 * sizeof(float), "z must follow y");
