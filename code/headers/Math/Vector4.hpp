@@ -27,7 +27,7 @@ namespace Math
 
 		[[nodiscard]] constexpr Type& operator[](std::size_t index) noexcept
 		{
-		    assert(index <= 4 && "operator[]: index must be less than 4");
+		    assert(index < 4 && "operator[]: index must be less than 4");
 			return index == 0 ? x : index == 1 ? y : index == 2 ? z :w;
 		}
 		[[nodiscard]] constexpr const Type& operator[](std::size_t index) const noexcept
@@ -61,6 +61,22 @@ namespace Math
     		y-=other_vector.y;
             z-=other_vector.z;
             w-=other_vector.w;
+    		return *this;
+		}
+		constexpr Vector4T& operator*=(const Vector4T other_vector) noexcept
+		{
+    		x*=other_vector.x;
+    		y*=other_vector.y;
+            z*=other_vector.z;
+            w*=other_vector.w;
+    		return *this;
+		}
+		constexpr Vector4T& operator/=(const Vector4T other_vector) noexcept
+		{
+    		x/=other_vector.x;
+    		y/=other_vector.y;
+            z/=other_vector.z;
+            w/=other_vector.w;
     		return *this;
 		}
 		constexpr Vector4T& operator*=( const Type scalar) noexcept
@@ -121,12 +137,19 @@ namespace Math
 	{
 		return Length(vector_a - vector_b);
 	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] bool Is_finite(const Vector4T<Type> vector) noexcept
+	{
+		return std::isfinite(vector.x) && std::isfinite(vector.y) && std::isfinite(vector.z) && std::isfinite(vector.w);
+	}
+
 	template <std::floating_point Type>
 	[[nodiscard]] bool Is_normalizable(const Vector4T<Type> vector) noexcept
 	{
-		return std::isfinite(vector.x) && std::isfinite(vector.y) && std::isfinite(vector.z) && std::isfinite(vector.w) &&
-	    (vector.x != 0 ||vector.y != 0 ||vector.z != 0 ||vector.w != 0 );
+		return Is_finite(vector) && (vector.x != 0 ||vector.y != 0 ||vector.z != 0 ||vector.w != 0 );
 	}
+
 	template <std::floating_point Type>
 	[[nodiscard]] Vector4T<Type> Normalize(const Vector4T<Type> vector) noexcept
 	{
@@ -173,17 +196,65 @@ namespace Math
 		return Equals(Length_squared(vector), Type(1), tolerance, Type(0));
 	}
 
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr bool Equals(const Vector4T<Type> vector_a, const Vector4T<Type> vector_b) noexcept
+	{
+		return Equals(vector_a.x, vector_b.x) && Equals(vector_a.y, vector_b.y) && Equals(vector_a.z, vector_b.z) && Equals(vector_a.w, vector_b.w);
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr bool Equals(const Vector4T<Type> vector_a, const Vector4T<Type> vector_b, const std::type_identity_t<Type> absolute_tolerance, const std::type_identity_t<Type> relative_tolerance) noexcept
+	{
+		return Equals(vector_a.x, vector_b.x, absolute_tolerance, relative_tolerance) && Equals(vector_a.y, vector_b.y, absolute_tolerance, relative_tolerance) &&
+			   Equals(vector_a.z, vector_b.z, absolute_tolerance, relative_tolerance) && Equals(vector_a.w, vector_b.w, absolute_tolerance, relative_tolerance);
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector4T<Type> Project(const Vector4T<Type> vector, const Vector4T<Type> onto) noexcept
+	{
+		const Type onto_length_squared = Length_squared(onto);
+		assert(onto_length_squared > Type(0) && "Project: 'onto' cannot be a zero vector");
+		return onto * (Dot(vector, onto) / onto_length_squared);
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector4T<Type> Reject(const Vector4T<Type> vector, const Vector4T<Type> onto) noexcept
+	{
+		return vector - Project(vector, onto);
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector4T<Type> Reflect(const Vector4T<Type> incident, const Vector4T<Type> normal) noexcept
+	{
+		assert(Equals(Length_squared(normal), Type(1)) && "Reflect: 'normal' must be normalized");
+		return incident - normal * (Type(2) * Dot(incident, normal));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector4T<Type> Refract(const Vector4T<Type> incident, const Vector4T<Type> normal, const std::type_identity_t<Type> refraction_ratio) noexcept
+	{
+		assert(Is_normalized(incident) && Is_normalized(normal) && "Refract: 'incident' and 'normal' must be normalized");
+		const Type normal_dot_incident = Dot(normal, incident);
+		const Type cos_refracted_squared = Type(1) - refraction_ratio * refraction_ratio * (Type(1) - normal_dot_incident * normal_dot_incident);
+		if (cos_refracted_squared < Type(0))
+		{
+			return Vector4T<Type>();
+		}
+		return incident * refraction_ratio - normal * (refraction_ratio * normal_dot_incident + std::sqrt(cos_refracted_squared));
+	}
+
+
 	template <typename Type>
 	[[nodiscard]] constexpr Vector4T<Type> Min(const Vector4T<Type> vector_a, const Vector4T<Type> vector_b) noexcept
 	{
-		return  Vector4T<Type>(vector_a.x < vector_b.x ? vector_a.x : vector_b.x, vector_a.y < vector_b.y ? vector_a.y : vector_b.y,
-						       vector_a.z < vector_b.z ? vector_a.z : vector_b.z, vector_a.w < vector_b.w ? vector_a.w : vector_b.w);
+	    return Vector4T<Type>(std::min(vector_a.x, vector_b.x), std::min(vector_a.y, vector_b.y),
+					          std::min(vector_a.z, vector_b.z),std::min(vector_a.w, vector_b.w));
 	}
 	template <typename Type>
 	[[nodiscard]] constexpr Vector4T<Type> Max(const Vector4T<Type> vector_a, const Vector4T<Type> vector_b) noexcept
 	{
-		return Vector4T<Type>(vector_a.x > vector_b.x ? vector_a.x : vector_b.x, vector_a.y > vector_b.y ? vector_a.y : vector_b.y,
-							  vector_a.z > vector_b.z ? vector_a.z : vector_b.z, vector_a.w > vector_b.w ? vector_a.w : vector_b.w);
+    	return Vector4T<Type>(std::max(vector_a.x, vector_b.x), std::max(vector_a.y, vector_b.y),
+    	                      std::max(vector_a.z, vector_b.z),std::max(vector_a.w, vector_b.w));
 	}
 	template <typename Type>
 	[[nodiscard]] constexpr Vector4T<Type> Clamp(const Vector4T<Type> vector, const Vector4T<Type> lower, const Vector4T<Type> upper) noexcept
@@ -252,7 +323,7 @@ namespace Math
 	template <std::floating_point Type>
 	[[nodiscard]] Vector4T<Type> Fract(const Vector4T<Type> vector) noexcept
 	{
-		return Vector4T<Type>(Fract_(vector.x), Fract_(vector.y), Fract_(vector.z), Fract_(vector.w));
+		return Vector4T<Type>(Fract(vector.x), Fract(vector.y), Fract(vector.z), Fract(vector.w));
 	}
 
 	template <std::floating_point Type>

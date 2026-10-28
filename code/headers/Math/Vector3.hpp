@@ -27,7 +27,7 @@ namespace Math
 
 		[[nodiscard]] constexpr Type& operator[](std::size_t index) noexcept
 		{
-		    assert(index <= 3 && "operator[]: index must be less than 3");
+		    assert(index < 3 && "operator[]: index must be less than 3");
 			return index == 0 ? x : index == 1 ? y : z;
 		}
 		[[nodiscard]] constexpr const Type& operator[](std::size_t index) const noexcept
@@ -60,6 +60,20 @@ namespace Math
             z-=other_vector.z;
     		return *this;
 		}
+		constexpr Vector3T& operator*=(const Vector3T other_vector) noexcept
+		{
+    		x*=other_vector.x;
+    		y*=other_vector.y;
+            z*=other_vector.z;
+    		return *this;
+		}
+		constexpr Vector3T& operator/=(const Vector3T other_vector) noexcept
+		{
+    		x/=other_vector.x;
+    		y/=other_vector.y;
+            z/=other_vector.z;
+    		return *this;
+		}
 		constexpr Vector3T& operator*=(const Type scalar) noexcept
 		{
     		x*=scalar;
@@ -86,10 +100,9 @@ namespace Math
 		[[nodiscard]] friend constexpr Vector3T operator/(Vector3T vector,const Type scalar) noexcept
 		{ return  vector/=scalar; }
 		[[nodiscard]] friend constexpr Vector3T operator*(const Vector3T vector_a, const Vector3T vector_b) noexcept
-		{ return Vector3T(vector_a.x*vector_b.x, vector_a.y*vector_b.y, vector_a.z*vector_b.z); }
+		{ return vector_a*=vector_b; }
 		[[nodiscard]] friend constexpr Vector3T operator/(const Vector3T vector_a, const Vector3T vector_b) noexcept
-		{ return Vector3T(vector_a.x/vector_b.x, vector_a.y/vector_b.y, vector_a.z/vector_b.z); }
-
+		{ return vector_a/=vector_b; }
 
 	};
 	template <typename Type>
@@ -117,11 +130,19 @@ namespace Math
 	{
 		return Length(vector_a - vector_b);
 	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] bool Is_finite(const Vector3T<Type> vector) noexcept
+	{
+		return std::isfinite(vector.x) && std::isfinite(vector.y) && std::isfinite(vector.z);
+	}
+
 	template <std::floating_point Type>
 	[[nodiscard]] bool Is_normalizable(const Vector3T<Type> vector) noexcept
 	{
-		return std::isfinite(vector.x) && std::isfinite(vector.y) && std::isfinite(vector.z) && (vector.x != 0 ||vector.y != 0 ||vector.z != 0 );
+		return Is_finite(vector) && (vector.x != 0 ||vector.y != 0 ||vector.z != 0 );
 	}
+
 	template <std::floating_point Type>
 	[[nodiscard]] Vector3T<Type> Normalize(const Vector3T<Type> vector) noexcept
 	{
@@ -164,6 +185,54 @@ namespace Math
 	}
 
 	template <std::floating_point Type>
+	[[nodiscard]] constexpr bool Equals(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
+	{
+		return Equals(vector_a.x, vector_b.x) && Equals(vector_a.y, vector_b.y) && Equals(vector_a.z, vector_b.z);
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr bool Equals(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b, const std::type_identity_t<Type> absolute_tolerance, const std::type_identity_t<Type> relative_tolerance) noexcept
+	{
+		return Equals(vector_a.x, vector_b.x, absolute_tolerance, relative_tolerance) && Equals(vector_a.y, vector_b.y, absolute_tolerance, relative_tolerance) &&
+			   Equals(vector_a.z, vector_b.z, absolute_tolerance, relative_tolerance);
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector3T<Type> Project(const Vector3T<Type> vector, const Vector3T<Type> onto) noexcept
+	{
+		const Type onto_length_squared = Length_squared(onto);
+		assert(onto_length_squared > Type(0) && "Project: 'onto' cannot be a zero vector");
+		return onto * (Dot(vector, onto) / onto_length_squared);
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector3T<Type> Reject(const Vector3T<Type> vector, const Vector3T<Type> onto) noexcept
+	{
+		return vector - Project(vector, onto);
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector3T<Type> Reflect(const Vector3T<Type> incident, const Vector3T<Type> normal) noexcept
+	{
+		assert(Equals(Length_squared(normal), Type(1)) && "Reflect: 'normal' must be normalized");
+		return incident - normal * (Type(2) * Dot(incident, normal));
+	}
+
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector3T<Type> Refract(const Vector3T<Type> incident, const Vector3T<Type> normal, const std::type_identity_t<Type> refraction_ratio) noexcept
+	{
+		assert(Is_normalized(incident) && Is_normalized(normal) && "Refract: 'incident' and 'normal' must be normalized");
+		const Type normal_dot_incident = Dot(normal, incident);
+		const Type cos_refracted_squared = Type(1) - refraction_ratio * refraction_ratio * (Type(1) - normal_dot_incident * normal_dot_incident);
+		if (cos_refracted_squared < Type(0))
+		{
+			return Vector3T<Type>();
+		}
+		return incident * refraction_ratio - normal * (refraction_ratio * normal_dot_incident + std::sqrt(cos_refracted_squared));
+	}
+
+	template <std::floating_point Type>
 	[[nodiscard]] bool Is_normalized(const Vector3T<Type> vector, const Type tolerance) noexcept
 	{
 		return Equals(Length_squared(vector), Type(1), tolerance, Type(0));
@@ -172,12 +241,12 @@ namespace Math
 	template <typename Type>
 	[[nodiscard]] constexpr Vector3T<Type> Min(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
 	{
-		return  Vector3T<Type>(vector_a.x < vector_b.x ? vector_a.x : vector_b.x, vector_a.y < vector_b.y ? vector_a.y : vector_b.y, vector_a.z < vector_b.z ? vector_a.z : vector_b.z);
+		return Vector4T<Type>(std::min(vector_a.x, vector_b.x), std::min(vector_a.y, vector_b.y), std::min(vector_a.z, vector_b.z));
 	}
 	template <typename Type>
 	[[nodiscard]] constexpr Vector3T<Type> Max(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
 	{
-		return Vector3T<Type>(vector_a.x > vector_b.x ? vector_a.x : vector_b.x, vector_a.y > vector_b.y ? vector_a.y : vector_b.y, vector_a.z > vector_b.z ? vector_a.z : vector_b.z);
+	return Vector4T<Type>(std::max(vector_a.x, vector_b.x), std::max(vector_a.y, vector_b.y), std::max(vector_a.z, vector_b.z));
 	}
 	template <typename Type>
 	[[nodiscard]] constexpr Vector3T<Type> Clamp(const Vector3T<Type> vector, const Vector3T<Type> lower, const Vector3T<Type> upper) noexcept
@@ -244,7 +313,7 @@ namespace Math
 	template <std::floating_point Type>
 	[[nodiscard]] Vector3T<Type> Fract(const Vector3T<Type> vector) noexcept
 	{
-		return Vector3T<Type>(Fract_(vector.x), Fract_(vector.y), Fract_(vector.z));
+		return Vector3T<Type>(Fract(vector.x), Fract(vector.y), Fract(vector.z));
 	}
 
 	template <std::floating_point Type>
@@ -271,7 +340,72 @@ namespace Math
 		return Vector3T<Type>(Smoothstep(lower_edge.x, upper_edge.x, value.x), Smoothstep(lower_edge.y, upper_edge.y, value.y), Smoothstep(lower_edge.z, upper_edge.z, value.z));
 	}
 
+	template <typename Type>
+	requires (!std::unsigned_integral<Type>)
+	[[nodiscard]] constexpr Vector3T<Type> Cross(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
+	{
+		return Vector3T<Type>(vector_a.y * vector_b.z - vector_a.z * vector_b.y, vector_a.z * vector_b.x - vector_a.x * vector_b.z, vector_a.x * vector_b.y - vector_a.y * vector_b.x);
+	}
 
+	template <std::floating_point Type>
+	[[nodiscard]] Vector3T<Type> Any_perpendicular(const Vector3T<Type> vector) noexcept
+	{
+	    assert(Is_normalizable(vector) && "Any_perpendicular: cannot find a perpendicular of a zero vector or infinites values");
+		const Vector3T<Type> perpendicular = detail::Abs_of(vector.x) > detail::Abs_of(vector.z)
+                                             ? Vector3T<Type>(-vector.y, vector.x, Type(0))
+                                             : Vector3T<Type>(Type(0), -vector.z, vector.y);
+		return Normalize(perpendicular);
+	}
+
+	template <std::floating_point T>
+	struct Orthonormal_basis3T
+	{
+		using Type = T;
+		Vector3T<Type> tangent, bitangent, normal;
+	};
+
+	template <std::floating_point Type>
+	[[nodiscard]] Orthonormal_basis3T<Type> Build_orthonormal_basis(const Vector3T<Type> normal) noexcept
+	{
+	    assert(Is_normalized(normal) && "Build_orthonormal_basis: 'normal' must be normalized");
+		const Type sign = std::copysign(Type(1), normal.z);
+		const Type factor = Type(-1) / (sign + normal.z);
+		const Type xy_factor = normal.x * normal.y * factor;
+
+		const Vector3T<Type> tangent(Type(1) + sign * normal.x * normal.x * factor, sign * xy_factor, -sign * normal.x);
+		const Vector3T<Type> bitangent(xy_factor, sign + normal.y * normal.y * factor, -normal.y);
+		return Orthonormal_basis3T<Type>{tangent, bitangent, normal};
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] Radians Angle_between(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
+	{
+	    assert(Is_normalizable(vector_a) && Is_normalizable(vector_b) && "Angle_between: cannot measure the angle of a zero vector or infinites values");
+		return Radians(static_cast<float>(std::atan2(Length(Cross(vector_a, vector_b)), Dot(vector_a, vector_b))));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector3T<Type> Slerp(const Vector3T<Type> from, const Vector3T<Type> to, const std::type_identity_t<Type> factor) noexcept
+	{
+		const Type from_length = Length(from);
+		const Type to_length = Length(to);
+		if (from_length == Type(0) || to_length == Type(0))
+		{
+			return Lerp(from, to, factor);
+		}
+
+		const Vector3T<Type> from_direction = from / from_length;
+		const Vector3T<Type> to_direction = to / to_length;
+
+		const Type cosine = Dot(from_direction, to_direction);
+		const Vector3T<Type> orthogonal = to_direction - from_direction * cosine;
+		const Type sine = Length(orthogonal);
+
+		const Vector3T<Type> tangent = sine > std::numeric_limits<Type>::epsilon() ? orthogonal / sine : Any_perpendicular(from_direction);
+		const Type angle = std::atan2(sine, cosine) * factor;
+
+		return (from_direction * std::cos(angle) + tangent * std::sin(angle)) * Lerp(from_length, to_length, factor);
+	}
 
 	using Vector3 = Vector3T<float>;
 	using Vector3i = Vector3T<std::int32_t>;

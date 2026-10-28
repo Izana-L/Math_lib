@@ -21,7 +21,7 @@ namespace Math
 			return value >= Type(0) ? value : -value;
 		}
 
-		// -1, 0 o +1 (con tipos sin signo, 0 o 1). Con NaN da 0.
+
 		template <typename Type>
 		[[nodiscard]] constexpr Type Sign_of(const Type value) noexcept
 		{
@@ -136,7 +136,7 @@ namespace Math
 		return target + (current - target) * std::exp(-decay_rate * delta_time);
 	}
 	template <std::floating_point T>
-	[[nodiscard]] T Fract_(const T value) noexcept
+	[[nodiscard]] T Fract(const T value) noexcept
 	{
 		return value - std::floor(value);
 	}

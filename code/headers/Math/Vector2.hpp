@@ -25,7 +25,7 @@ namespace Math
 
 		[[nodiscard]] constexpr Type& operator[](std::size_t index) noexcept
 		{
-		    assert(index <= 2 && "operator[]: index must be less than 2");
+		    assert(index < 2 && "operator[]: index must be less than 2");
 			return index == 0 ? x : y;
 		}
 		[[nodiscard]] constexpr const Type& operator[](std::size_t index) const noexcept
@@ -52,13 +52,26 @@ namespace Math
     		y-=other_vector.y;
     		return *this;
 		}
-		constexpr Vector2T& operator*=( const Type& scalar) noexcept
+		constexpr Vector2T& operator*=( const Vector2T other_vector) noexcept
+		{
+		    x*=other_vector.x;
+    		y*=other_vector.y;
+    		return *this;
+		}
+		constexpr Vector2T& operator/=( const Vector2T other_vector) noexcept
+		{
+		    x/=other_vector.x;
+    		y/=other_vector.y;
+        	return *this;
+	    }
+
+		constexpr Vector2T& operator*=( const Type scalar) noexcept
 		{
     		x*=scalar;
     		y*=scalar;
     		return *this;
 		}
-		constexpr Vector2T& operator/=( const Type& scalar) noexcept
+		constexpr Vector2T& operator/=( const Type scalar) noexcept
 		{
         	x/=scalar;
         	y/=scalar;
@@ -76,9 +89,9 @@ namespace Math
 		[[nodiscard]] friend constexpr Vector2T operator/(Vector2T vector, Type scalar) noexcept
 		{ return  vector/=scalar; }
 		[[nodiscard]] friend constexpr Vector2T operator*(const Vector2T vector_a, const Vector2T vector_b) noexcept
-		{ return Vector2T(vector_a.x*vector_b.x,vector_a.y*vector_b.y); }
+		{ return vector_a*=vector_b; }
 		[[nodiscard]] friend constexpr Vector2T operator/(const Vector2T vector_a, const Vector2T vector_b) noexcept
-		{ return Vector2T(vector_a.x/vector_b.x,vector_a.y/vector_b.y); }
+		{ return vector_a/=vector_b; }
 
 
 
@@ -109,11 +122,19 @@ namespace Math
 	{
 		return Length(vector_a - vector_b);
 	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] bool Is_finite(const Vector2T<Type> vector) noexcept
+	{
+		return std::isfinite(vector.x) && std::isfinite(vector.y);
+	}
+
 	template <std::floating_point Type>
 	[[nodiscard]] bool Is_normalizable(const Vector2T<Type> vector) noexcept
 	{
-		return std::isfinite(vector.x) && std::isfinite(vector.y) && (vector.x != 0 ||vector.y != 0 );
+		return Is_finite(vector) && (vector.x != 0 ||vector.y != 0 );
 	}
+
 	template <std::floating_point Type>
 	[[nodiscard]] Vector2T<Type> Normalize(const Vector2T<Type> vector) noexcept
 	{
@@ -149,10 +170,57 @@ namespace Math
 
 		return Try_normalize(vector).value_or(fallback);
 	}
+
 	template <std::floating_point Type>
 	[[nodiscard]] bool Is_normalized(const Vector2T<Type> vector) noexcept
 	{
 		return Equals(Length_squared(vector), Type(1));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr bool Equals(const Vector2T<Type> vector_a, const Vector2T<Type> vector_b) noexcept
+	{
+		return Equals(vector_a.x, vector_b.x) && Equals(vector_a.y, vector_b.y);
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr bool Equals(const Vector2T<Type> vector_a, const Vector2T<Type> vector_b, const std::type_identity_t<Type> absolute_tolerance, const std::type_identity_t<Type> relative_tolerance) noexcept
+	{
+		return Equals(vector_a.x, vector_b.x, absolute_tolerance, relative_tolerance) && Equals(vector_a.y, vector_b.y, absolute_tolerance, relative_tolerance);
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector2T<Type> Project(const Vector2T<Type> vector, const Vector2T<Type> onto) noexcept
+	{
+		const Type onto_length_squared = Length_squared(onto);
+		assert(onto_length_squared > Type(0) && "Project: 'onto' cannot be a zero vector");
+		return onto * (Dot(vector, onto) / onto_length_squared);
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector2T<Type> Reject(const Vector2T<Type> vector, const Vector2T<Type> onto) noexcept
+	{
+		return vector - Project(vector, onto);
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr Vector2T<Type> Reflect(const Vector2T<Type> incident, const Vector2T<Type> normal) noexcept
+	{
+		assert(Equals(Length_squared(normal), Type(1)) && "Reflect: 'normal' must be normalized");
+		return incident - normal * (Type(2) * Dot(incident, normal));
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector2T<Type> Refract(const Vector2T<Type> incident, const Vector2T<Type> normal, const std::type_identity_t<Type> refraction_ratio) noexcept
+	{
+		assert(Is_normalized(incident) && Is_normalized(normal) && "Refract: 'incident' and 'normal' must be normalized");
+		const Type normal_dot_incident = Dot(normal, incident);
+		const Type cos_refracted_squared = Type(1) - refraction_ratio * refraction_ratio * (Type(1) - normal_dot_incident * normal_dot_incident);
+		if (cos_refracted_squared < Type(0))
+		{
+			return Vector2T<Type>();
+		}
+		return incident * refraction_ratio - normal * (refraction_ratio * normal_dot_incident + std::sqrt(cos_refracted_squared));
 	}
 
 	template <std::floating_point Type>
@@ -164,12 +232,12 @@ namespace Math
 	template <typename Type>
 	[[nodiscard]] constexpr Vector2T<Type> Min(const Vector2T<Type> vector_a, const Vector2T<Type> vector_b) noexcept
 	{
-		return  Vector2T<Type>(vector_a.x < vector_b.x ? vector_a.x : vector_b.x,vector_a.y < vector_b.y ? vector_a.y : vector_b.y);
+		return Vector2T<Type>(std::min(vector_a.x, vector_b.x), std::min(vector_a.y, vector_b.y));
 	}
 	template <typename Type>
 	[[nodiscard]] constexpr Vector2T<Type> Max(const Vector2T<Type> vector_a, const Vector2T<Type> vector_b) noexcept
 	{
-		return Vector2T<Type>(vector_a.x > vector_b.x ? vector_a.x : vector_b.x,vector_a.y > vector_b.y ? vector_a.y : vector_b.y);
+		return Vector2T<Type>(std::max(vector_a.x, vector_b.x), std::max(vector_a.y, vector_b.y));
 	}
 	template <typename Type>
 	[[nodiscard]] constexpr Vector2T<Type> Clamp(const Vector2T<Type> vector, const Vector2T<Type> lower, const Vector2T<Type> upper) noexcept
@@ -198,7 +266,7 @@ namespace Math
 	template <std::floating_point Type>
 	[[nodiscard]] Vector2T<Type> Fract(const Vector2T<Type> vector) noexcept
 	{
-		return Vector2T<Type>(Fract_(vector.x), Fract_(vector.y));
+		return Vector2T<Type>(Fract(vector.x), Fract(vector.y));
 	}
 
 	template <typename Type>
@@ -261,7 +329,27 @@ namespace Math
 		return Vector2T<Type>(Smoothstep(lower_edge.x, upper_edge.x, value.x), Smoothstep(lower_edge.y, upper_edge.y, value.y));
 	}
 
+	template <typename Type>
+	requires (!std::unsigned_integral<Type>)
+	[[nodiscard]] constexpr Type Cross(const Vector2T<Type> vector_a, const Vector2T<Type> vector_b) noexcept
+	{
+		return vector_a.x * vector_b.y - vector_a.y * vector_b.x;
+	}
 
+	template <typename Type>
+	requires (!std::unsigned_integral<Type>)
+	[[nodiscard]] constexpr Vector2T<Type> Perpendicular(const Vector2T<Type> vector) noexcept
+	{
+		return Vector2T<Type>(-vector.y, vector.x);
+	}
+
+	template <std::floating_point Type>
+	[[nodiscard]] Vector2T<Type> Rotate(const Vector2T<Type> vector, const Radians angle) noexcept
+	{
+		const Type cosine = std::cos(static_cast<Type>(angle.value));
+		const Type sine = std::sin(static_cast<Type>(angle.value));
+		return Vector2T<Type>(vector.x * cosine - vector.y * sine, vector.x * sine + vector.y * cosine);
+	}
 
 	using Vector2 = Vector2T<float>;
 	using Vector2i = Vector2T<std::int32_t>;
