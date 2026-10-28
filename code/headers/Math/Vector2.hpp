@@ -101,19 +101,19 @@ namespace Math
 		{ return vector_a/=vector_b; }
 		[[nodiscard]] friend constexpr Vector2T operator+(Vector2T vector, Type scalar) noexcept
 		{ return  vector+=scalar; }
-		[[nodiscard]] friend constexpr Vector2T operator+(Type scalar, Vector2T vector) noexcept
+		[[nodiscard]] friend constexpr Vector2T operator+(const Type scalar, Vector2T vector) noexcept
 		{ return  vector+=scalar; }
-		[[nodiscard]] friend constexpr Vector2T operator-(Vector2T vector, Type scalar) noexcept
+		[[nodiscard]] friend constexpr Vector2T operator-(Vector2T vector, const Type scalar) noexcept
 		{ return  vector-=scalar; }
-		[[nodiscard]] friend constexpr Vector2T operator-(Type scalar, Vector2T vector) noexcept
+		[[nodiscard]] friend constexpr Vector2T operator-(const Type scalar, Vector2T vector) noexcept
 		{ return Vector2T(scalar-vector.x, scalar-vector.y);}
-		[[nodiscard]] friend constexpr Vector2T operator*(Vector2T vector, Type scalar) noexcept
+		[[nodiscard]] friend constexpr Vector2T operator*(Vector2T vector,const Type scalar) noexcept
 		{ return  vector*=scalar; }
-		[[nodiscard]] friend constexpr Vector2T operator*(Type scalar, Vector2T vector) noexcept
+		[[nodiscard]] friend constexpr Vector2T operator*(const Type scalar, Vector2T vector) noexcept
 		{ return  vector*=scalar; }
-		[[nodiscard]] friend constexpr Vector2T operator/(Vector2T vector, Type scalar) noexcept
+		[[nodiscard]] friend constexpr Vector2T operator/(Vector2T vector, const Type scalar) noexcept
 		{ return  vector/=scalar; }
-		[[nodiscard]] friend constexpr Vector2T operator/(Type scalar, Vector2T vector) noexcept
+		[[nodiscard]] friend constexpr Vector2T operator/(const Type scalar, Vector2T vector) noexcept
 		{ return Vector2T(scalar/vector.x,scalar/vector.y);}
 
 
@@ -230,7 +230,7 @@ namespace Math
 	template <std::floating_point Type>
 	[[nodiscard]] constexpr Vector2T<Type> Reflect(const Vector2T<Type> incident, const Vector2T<Type> normal) noexcept
 	{
-		assert(Equals(Length_squared(normal), Type(1)) && "Reflect: 'normal' must be normalized");
+		assert(Is_normalized(normal) && "Reflect: 'normal' must be normalized");
 		return incident - normal * (Type(2) * Dot(incident, normal));
 	}
 

@@ -120,13 +120,13 @@ namespace Math
 		{ return vector_a*=vector_b; }
 		[[nodiscard]] friend constexpr Vector4T operator/( Vector4T vector_a, const Vector4T vector_b) noexcept
 		{ return vector_a/=vector_b; }
-		[[nodiscard]] friend constexpr Vector4T operator+(Vector4T vector, Type scalar) noexcept
+		[[nodiscard]] friend constexpr Vector4T operator+(Vector4T vector, const Type scalar) noexcept
 		{ return vector+=scalar; }
-		[[nodiscard]] friend constexpr Vector4T operator+(Type scalar, Vector4T vector) noexcept
+		[[nodiscard]] friend constexpr Vector4T operator+(const Type scalar, Vector4T vector) noexcept
 		{ return  vector+=scalar; }
-		[[nodiscard]] friend constexpr Vector4T operator-(Vector4T vector, Type scalar) noexcept
+		[[nodiscard]] friend constexpr Vector4T operator-(Vector4T vector,const Type scalar) noexcept
 		{ return vector-=scalar; }
-		[[nodiscard]] friend constexpr Vector4T operator-(Type scalar, Vector4T vector) noexcept
+		[[nodiscard]] friend constexpr Vector4T operator-(const Type scalar, Vector4T vector) noexcept
 		{ return Vector4T(scalar-vector.x, scalar-vector.y, scalar-vector.z, scalar-vector.w);}
 		[[nodiscard]] friend constexpr Vector4T operator*(Vector4T vector, const Type scalar) noexcept
 		{ return vector*=scalar; }
@@ -134,7 +134,7 @@ namespace Math
 		{ return vector*=scalar; }
 		[[nodiscard]] friend constexpr Vector4T operator/(Vector4T vector,const Type scalar) noexcept
 		{ return vector/=scalar; }
-		[[nodiscard]] friend constexpr Vector4T operator/(Type scalar, Vector4T vector) noexcept
+		[[nodiscard]] friend constexpr Vector4T operator/(const Type scalar, Vector4T vector) noexcept
 		{ return Vector4T(scalar/vector.x, scalar/vector.y, scalar/vector.z, scalar/vector.w);}
 
 	};
@@ -212,13 +212,13 @@ namespace Math
 		return Try_normalize(vector).value_or(fallback);
 	}
 	template <std::floating_point Type>
-	[[nodiscard]] bool Is_normalized(const Vector4T<Type> vector) noexcept
+	[[nodiscard]] constexpr bool Is_normalized(const Vector4T<Type> vector) noexcept
 	{
 		return Equals(Length_squared(vector), Type(1));
 	}
 
 	template <std::floating_point Type>
-	[[nodiscard]] bool Is_normalized(const Vector4T<Type> vector, const Type tolerance) noexcept
+	[[nodiscard]] constexpr bool Is_normalized(const Vector4T<Type> vector, const Type tolerance) noexcept
 	{
 		return Equals(Length_squared(vector), Type(1), tolerance, Type(0));
 	}
@@ -253,7 +253,7 @@ namespace Math
 	template <std::floating_point Type>
 	[[nodiscard]] constexpr Vector4T<Type> Reflect(const Vector4T<Type> incident, const Vector4T<Type> normal) noexcept
 	{
-		assert(Equals(Length_squared(normal), Type(1)) && "Reflect: 'normal' must be normalized");
+		assert(Is_normalized(normal) && "Reflect: 'normal' must be normalized");
 		return incident - normal * (Type(2) * Dot(incident, normal));
 	}
 
