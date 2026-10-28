@@ -30,7 +30,7 @@ namespace Math
 		}
 		[[nodiscard]] constexpr const Type& operator[](std::size_t index) const noexcept
 		{
-		    assert(index <= 2 && "operator[]: index must be less than 2");
+		    assert(index < 2 && "operator[]: index must be less than 2");
 			return index == 0 ? x : y;
 		}
 		[[nodiscard]] constexpr Type* Data() noexcept { return &x; }
@@ -65,6 +65,19 @@ namespace Math
         	return *this;
 	    }
 
+		constexpr Vector2T& operator+=( const Type scalar) noexcept
+		{
+    		x+=scalar;
+    		y+=scalar;
+    		return *this;
+		}
+		constexpr Vector2T& operator-=( const Type scalar) noexcept
+		{
+        	x-=scalar;
+        	y-=scalar;
+        	return *this;
+		}
+
 		constexpr Vector2T& operator*=( const Type scalar) noexcept
 		{
     		x*=scalar;
@@ -82,12 +95,18 @@ namespace Math
 		{ return vector_a+=vector_b; }
 		[[nodiscard]] friend constexpr Vector2T operator-(Vector2T vector_a, const Vector2T vector_b) noexcept
 		{ return  vector_a-=vector_b; }
+		[[nodiscard]] friend constexpr Vector2T operator+(Vector2T vector, Type scalar) noexcept
+		{ return  vector+=scalar; }
+		[[nodiscard]] friend constexpr Vector2T operator-(Vector2T vector, Type scalar) noexcept
+		{ return  vector-=scalar; }
 		[[nodiscard]] friend constexpr Vector2T operator*(Vector2T vector, Type scalar) noexcept
 		{ return  vector*=scalar; }
 		[[nodiscard]] friend constexpr Vector2T operator*(Type scalar, Vector2T vector) noexcept
 		{ return  vector*=scalar; }
 		[[nodiscard]] friend constexpr Vector2T operator/(Vector2T vector, Type scalar) noexcept
 		{ return  vector/=scalar; }
+		[[nodiscard]] friend constexpr Vector2T operator/(Type scalar, Vector2T vector) noexcept
+		{ return Vector2T(scalar/vector.x,scalar/vector.y);}
 		[[nodiscard]] friend constexpr Vector2T operator*(const Vector2T vector_a, const Vector2T vector_b) noexcept
 		{ return vector_a*=vector_b; }
 		[[nodiscard]] friend constexpr Vector2T operator/(const Vector2T vector_a, const Vector2T vector_b) noexcept
@@ -172,7 +191,7 @@ namespace Math
 	}
 
 	template <std::floating_point Type>
-	[[nodiscard]] bool Is_normalized(const Vector2T<Type> vector) noexcept
+	[[nodiscard]] constexpr bool Is_normalized(const Vector2T<Type> vector) noexcept
 	{
 		return Equals(Length_squared(vector), Type(1));
 	}

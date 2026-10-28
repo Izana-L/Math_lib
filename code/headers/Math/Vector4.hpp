@@ -32,7 +32,7 @@ namespace Math
 		}
 		[[nodiscard]] constexpr const Type& operator[](std::size_t index) const noexcept
 		{
-		    assert(index <= 4 && "operator[]: index must be less than 4");
+		    assert(index < 4 && "operator[]: index must be less than 4");
 			return index == 0 ? x : index == 1 ? y : index == 2 ? z : w;
 		}
 		[[nodiscard]] constexpr Type* Data() noexcept { return &x; }
@@ -79,6 +79,22 @@ namespace Math
             w/=other_vector.w;
     		return *this;
 		}
+		constexpr Vector4T& operator+=( const Type scalar) noexcept
+		{
+    		x+=scalar;
+    		y+=scalar;
+            z+=scalar;
+            w+=scalar;
+    		return *this;
+		}
+		constexpr Vector4T& operator-=( const Type scalar) noexcept
+		{
+        	x-=scalar;
+        	y-=scalar;
+            z-=scalar;
+            w-=scalar;
+        	return *this;
+	    }
 		constexpr Vector4T& operator*=( const Type scalar) noexcept
 		{
     		x*=scalar;
@@ -99,13 +115,19 @@ namespace Math
 		[[nodiscard]] friend constexpr Vector4T operator+( Vector4T vector_a, const Vector4T vector_b) noexcept
 		{ return vector_a+=vector_b; }
 		[[nodiscard]] friend constexpr Vector4T operator-(Vector4T vector_a, const Vector4T vector_b) noexcept
-		{ return  vector_a-=vector_b; }
+		{ return vector_a-=vector_b; }
+		[[nodiscard]] friend constexpr Vector4T operator+(Vector4T vector, Type scalar) noexcept
+		{ return vector+=scalar; }
+		[[nodiscard]] friend constexpr Vector4T operator-(Vector4T vector, Type scalar) noexcept
+		{ return vector-=scalar; }
 		[[nodiscard]] friend constexpr Vector4T operator*(Vector4T vector, const Type scalar) noexcept
-		{ return  vector*=scalar; }
+		{ return vector*=scalar; }
 		[[nodiscard]] friend constexpr Vector4T operator*(const Type scalar, Vector4T vector) noexcept
-		{ return  vector*=scalar; }
+		{ return vector*=scalar; }
 		[[nodiscard]] friend constexpr Vector4T operator/(Vector4T vector,const Type scalar) noexcept
-		{ return  vector/=scalar; }
+		{ return vector/=scalar; }
+		[[nodiscard]] friend constexpr Vector4T operator/(Type scalar, Vector4T vector) noexcept
+		{ return Vector4T(scalar/vector.x, scalar/vector.y, scalar/vector.z, scalar/vector.w);}
 		[[nodiscard]] friend constexpr Vector4T operator*(const Vector4T vector_a, const Vector4T vector_b) noexcept
 		{ return Vector4T(vector_a.x*vector_b.x, vector_a.y*vector_b.y, vector_a.z*vector_b.z, vector_a.w*vector_b.w); }
 		[[nodiscard]] friend constexpr Vector4T operator/(const Vector4T vector_a, const Vector4T vector_b) noexcept

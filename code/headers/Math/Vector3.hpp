@@ -32,7 +32,7 @@ namespace Math
 		}
 		[[nodiscard]] constexpr const Type& operator[](std::size_t index) const noexcept
 		{
-		    assert(index <= 3 && "operator[]: index must be less than 3");
+		    assert(index < 3 && "operator[]: index must be less than 3");
 			return index == 0 ? x : index == 1 ? y : z;
 		}
 		[[nodiscard]] constexpr Type* Data() noexcept { return &x; }
@@ -74,6 +74,20 @@ namespace Math
             z/=other_vector.z;
     		return *this;
 		}
+		constexpr Vector3T& operator+=(const Type scalar) noexcept
+		{
+    		x+=scalar;
+    		y+=scalar;
+            z+=scalar;
+    		return *this;
+		}
+		constexpr Vector3T& operator-=(const Type scalar) noexcept
+		{
+        	x-=scalar;
+        	y-=scalar;
+            z-=scalar;
+        	return *this;
+	    }
 		constexpr Vector3T& operator*=(const Type scalar) noexcept
 		{
     		x*=scalar;
@@ -93,12 +107,18 @@ namespace Math
 		{ return vector_a+=vector_b; }
 		[[nodiscard]] friend constexpr Vector3T operator-(Vector3T vector_a, const Vector3T vector_b) noexcept
 		{ return  vector_a-=vector_b; }
+		[[nodiscard]] friend constexpr Vector3T operator+(Vector3T vector, Type scalar) noexcept
+		{ return  vector+=scalar; }
+		[[nodiscard]] friend constexpr Vector3T operator-(Vector3T vector, Type scalar) noexcept
+		{ return  vector-=scalar; }
 		[[nodiscard]] friend constexpr Vector3T operator*(Vector3T vector, const Type scalar) noexcept
 		{ return  vector*=scalar; }
 		[[nodiscard]] friend constexpr Vector3T operator*(const Type scalar, Vector3T vector) noexcept
 		{ return  vector*=scalar; }
 		[[nodiscard]] friend constexpr Vector3T operator/(Vector3T vector,const Type scalar) noexcept
 		{ return  vector/=scalar; }
+		[[nodiscard]] friend constexpr Vector3T operator/(Type scalar, Vector3T vector) noexcept
+		{ return Vector2T(scalar/vector.x,scalar/vector.y,scalar/vector.z); }
 		[[nodiscard]] friend constexpr Vector3T operator*(const Vector3T vector_a, const Vector3T vector_b) noexcept
 		{ return vector_a*=vector_b; }
 		[[nodiscard]] friend constexpr Vector3T operator/(const Vector3T vector_a, const Vector3T vector_b) noexcept
@@ -138,7 +158,7 @@ namespace Math
 	}
 
 	template <std::floating_point Type>
-	[[nodiscard]] bool Is_normalizable(const Vector3T<Type> vector) noexcept
+	[[nodiscard]] constexpr bool Is_normalizable(const Vector3T<Type> vector) noexcept
 	{
 		return Is_finite(vector) && (vector.x != 0 ||vector.y != 0 ||vector.z != 0 );
 	}
@@ -214,10 +234,9 @@ namespace Math
 	template <std::floating_point Type>
 	[[nodiscard]] constexpr Vector3T<Type> Reflect(const Vector3T<Type> incident, const Vector3T<Type> normal) noexcept
 	{
-		assert(Equals(Length_squared(normal), Type(1)) && "Reflect: 'normal' must be normalized");
+		assert(Is_normalizable(normal) && "Reflect: 'normal' must be normalized");
 		return incident - normal * (Type(2) * Dot(incident, normal));
 	}
-
 
 	template <std::floating_point Type>
 	[[nodiscard]] Vector3T<Type> Refract(const Vector3T<Type> incident, const Vector3T<Type> normal, const std::type_identity_t<Type> refraction_ratio) noexcept
@@ -282,13 +301,11 @@ namespace Math
 		return Vector3T<Type>(detail::Abs_of(vector.x), detail::Abs_of(vector.y), detail::Abs_of(vector.z));
 	}
 
-
 	template <typename Type>
 	[[nodiscard]] constexpr Vector3T<Type> Sign(const Vector3T<Type> vector) noexcept
 	{
 		return Vector3T<Type>(detail::Sign_of(vector.x), detail::Sign_of(vector.y), detail::Sign_of(vector.z));
 	}
-
 
 	template <std::floating_point Type>
 	[[nodiscard]] constexpr Vector3T<Type> Saturate(const Vector3T<Type> vector) noexcept
@@ -296,13 +313,11 @@ namespace Math
 		return Vector3T<Type>(Saturate(vector.x), Saturate(vector.y), Saturate(vector.z));
 	}
 
-
 	template <std::floating_point Type>
 	[[nodiscard]] Vector3T<Type> Floor(const Vector3T<Type> vector) noexcept
 	{
 		return Vector3T<Type>(std::floor(vector.x), std::floor(vector.y), std::floor(vector.z));
 	}
-
 
 	template <std::floating_point Type>
 	[[nodiscard]] Vector3T<Type> Ceil(const Vector3T<Type> vector) noexcept
@@ -358,14 +373,14 @@ namespace Math
 	}
 
 	template <std::floating_point T>
-	struct Orthonormal_basis3T
+	struct OrthonormalBasis3T
 	{
 		using Type = T;
 		Vector3T<Type> tangent, bitangent, normal;
 	};
 
 	template <std::floating_point Type>
-	[[nodiscard]] Orthonormal_basis3T<Type> Build_orthonormal_basis(const Vector3T<Type> normal) noexcept
+	[[nodiscard]] OrthonormalBasis3T<Type> Build_orthonormal_basis(const Vector3T<Type> normal) noexcept
 	{
 	    assert(Is_normalized(normal) && "Build_orthonormal_basis: 'normal' must be normalized");
 		const Type sign = std::copysign(Type(1), normal.z);
@@ -374,37 +389,29 @@ namespace Math
 
 		const Vector3T<Type> tangent(Type(1) + sign * normal.x * normal.x * factor, sign * xy_factor, -sign * normal.x);
 		const Vector3T<Type> bitangent(xy_factor, sign + normal.y * normal.y * factor, -normal.y);
-		return Orthonormal_basis3T<Type>{tangent, bitangent, normal};
+		return OrthonormalBasis3T<Type>{tangent, bitangent, normal};
 	}
 
 	template <std::floating_point Type>
 	[[nodiscard]] Radians Angle_between(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
 	{
 	    assert(Is_normalizable(vector_a) && Is_normalizable(vector_b) && "Angle_between: cannot measure the angle of a zero vector or infinites values");
-		return Radians(static_cast<float>(std::atan2(Length(Cross(vector_a, vector_b)), Dot(vector_a, vector_b))));
+		const Vector3T<Type> direction_a = Normalize(vector_a);
+		const Vector3T<Type> direction_b = Normalize(vector_b);
+		return Radians(static_cast<float>(std::atan2(Length(Cross(direction_a, direction_b)), Dot(direction_a, direction_b))));
 	}
 
 	template <std::floating_point Type>
 	[[nodiscard]] Vector3T<Type> Slerp(const Vector3T<Type> from, const Vector3T<Type> to, const std::type_identity_t<Type> factor) noexcept
 	{
-		const Type from_length = Length(from);
-		const Type to_length = Length(to);
-		if (from_length == Type(0) || to_length == Type(0))
-		{
-			return Lerp(from, to, factor);
-		}
-
-		const Vector3T<Type> from_direction = from / from_length;
-		const Vector3T<Type> to_direction = to / to_length;
-
-		const Type cosine = Dot(from_direction, to_direction);
-		const Vector3T<Type> orthogonal = to_direction - from_direction * cosine;
+		assert(Is_normalized(from) && Is_normalized(to) && "Slerp: 'from' and 'to' must be normalized");
+		const Vector3T<Type> orthogonal = Reject(to, from);
+		const Vector3T<Type> reorthogonal = Reject(orthogonal, from);
 		const Type sine = Length(orthogonal);
 
-		const Vector3T<Type> tangent = sine > std::numeric_limits<Type>::epsilon() ? orthogonal / sine : Any_perpendicular(from_direction);
-		const Type angle = std::atan2(sine, cosine) * factor;
-
-		return (from_direction * std::cos(angle) + tangent * std::sin(angle)) * Lerp(from_length, to_length, factor);
+		const Vector3T<Type> tangent = Type(2) * Length(reorthogonal) > sine ? Normalize(reorthogonal) : Any_perpendicular(from);
+		const Type angle = std::atan2(sine, Dot(from, to)) * factor;
+		return from * std::cos(angle) + tangent * std::sin(angle);
 	}
 
 	using Vector3 = Vector3T<float>;
