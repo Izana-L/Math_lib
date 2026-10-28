@@ -116,10 +116,18 @@ namespace Math
 		{ return vector_a+=vector_b; }
 		[[nodiscard]] friend constexpr Vector4T operator-(Vector4T vector_a, const Vector4T vector_b) noexcept
 		{ return vector_a-=vector_b; }
+		[[nodiscard]] friend constexpr Vector4T operator*( Vector4T vector_a, const Vector4T vector_b) noexcept
+		{ return vector_a*=vector_b; }
+		[[nodiscard]] friend constexpr Vector4T operator/( Vector4T vector_a, const Vector4T vector_b) noexcept
+		{ return vector_a/=vector_b; }
 		[[nodiscard]] friend constexpr Vector4T operator+(Vector4T vector, Type scalar) noexcept
 		{ return vector+=scalar; }
+		[[nodiscard]] friend constexpr Vector4T operator+(Type scalar, Vector4T vector) noexcept
+		{ return  vector+=scalar; }
 		[[nodiscard]] friend constexpr Vector4T operator-(Vector4T vector, Type scalar) noexcept
 		{ return vector-=scalar; }
+		[[nodiscard]] friend constexpr Vector4T operator-(Type scalar, Vector4T vector) noexcept
+		{ return Vector4T(scalar-vector.x, scalar-vector.y, scalar-vector.z, scalar-vector.w);}
 		[[nodiscard]] friend constexpr Vector4T operator*(Vector4T vector, const Type scalar) noexcept
 		{ return vector*=scalar; }
 		[[nodiscard]] friend constexpr Vector4T operator*(const Type scalar, Vector4T vector) noexcept
@@ -128,10 +136,7 @@ namespace Math
 		{ return vector/=scalar; }
 		[[nodiscard]] friend constexpr Vector4T operator/(Type scalar, Vector4T vector) noexcept
 		{ return Vector4T(scalar/vector.x, scalar/vector.y, scalar/vector.z, scalar/vector.w);}
-		[[nodiscard]] friend constexpr Vector4T operator*(const Vector4T vector_a, const Vector4T vector_b) noexcept
-		{ return Vector4T(vector_a.x*vector_b.x, vector_a.y*vector_b.y, vector_a.z*vector_b.z, vector_a.w*vector_b.w); }
-		[[nodiscard]] friend constexpr Vector4T operator/(const Vector4T vector_a, const Vector4T vector_b) noexcept
-		{ return Vector4T(vector_a.x/vector_b.x, vector_a.y/vector_b.y, vector_a.z/vector_b.z, vector_a.w/vector_b.w); }
+
 	};
 
 	template <typename Type>

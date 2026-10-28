@@ -95,10 +95,18 @@ namespace Math
 		{ return vector_a+=vector_b; }
 		[[nodiscard]] friend constexpr Vector2T operator-(Vector2T vector_a, const Vector2T vector_b) noexcept
 		{ return  vector_a-=vector_b; }
+		[[nodiscard]] friend constexpr Vector2T operator*( Vector2T vector_a, const Vector2T vector_b) noexcept
+		{ return vector_a*=vector_b; }
+		[[nodiscard]] friend constexpr Vector2T operator/( Vector2T vector_a, const Vector2T vector_b) noexcept
+		{ return vector_a/=vector_b; }
 		[[nodiscard]] friend constexpr Vector2T operator+(Vector2T vector, Type scalar) noexcept
+		{ return  vector+=scalar; }
+		[[nodiscard]] friend constexpr Vector2T operator+(Type scalar, Vector2T vector) noexcept
 		{ return  vector+=scalar; }
 		[[nodiscard]] friend constexpr Vector2T operator-(Vector2T vector, Type scalar) noexcept
 		{ return  vector-=scalar; }
+		[[nodiscard]] friend constexpr Vector2T operator-(Type scalar, Vector2T vector) noexcept
+		{ return Vector2T(scalar-vector.x, scalar-vector.y);}
 		[[nodiscard]] friend constexpr Vector2T operator*(Vector2T vector, Type scalar) noexcept
 		{ return  vector*=scalar; }
 		[[nodiscard]] friend constexpr Vector2T operator*(Type scalar, Vector2T vector) noexcept
@@ -107,10 +115,7 @@ namespace Math
 		{ return  vector/=scalar; }
 		[[nodiscard]] friend constexpr Vector2T operator/(Type scalar, Vector2T vector) noexcept
 		{ return Vector2T(scalar/vector.x,scalar/vector.y);}
-		[[nodiscard]] friend constexpr Vector2T operator*(const Vector2T vector_a, const Vector2T vector_b) noexcept
-		{ return vector_a*=vector_b; }
-		[[nodiscard]] friend constexpr Vector2T operator/(const Vector2T vector_a, const Vector2T vector_b) noexcept
-		{ return vector_a/=vector_b; }
+
 
 
 
@@ -243,7 +248,7 @@ namespace Math
 	}
 
 	template <std::floating_point Type>
-	[[nodiscard]] bool Is_normalized(const Vector2T<Type> vector, const Type tolerance) noexcept
+	[[nodiscard]] constexpr bool Is_normalized(const Vector2T<Type> vector, const Type tolerance) noexcept
 	{
 		return Equals(Length_squared(vector), Type(1), tolerance, Type(0));
 	}

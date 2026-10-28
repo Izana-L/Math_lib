@@ -107,10 +107,18 @@ namespace Math
 		{ return vector_a+=vector_b; }
 		[[nodiscard]] friend constexpr Vector3T operator-(Vector3T vector_a, const Vector3T vector_b) noexcept
 		{ return  vector_a-=vector_b; }
+		[[nodiscard]] friend constexpr Vector3T operator*( Vector3T vector_a, const Vector3T vector_b) noexcept
+		{ return vector_a*=vector_b; }
+		[[nodiscard]] friend constexpr Vector3T operator/( Vector3T vector_a, const Vector3T vector_b) noexcept
+		{ return vector_a/=vector_b; }
 		[[nodiscard]] friend constexpr Vector3T operator+(Vector3T vector, Type scalar) noexcept
+		{ return  vector+=scalar; }
+		[[nodiscard]] friend constexpr Vector3T operator+(Type scalar, Vector3T vector) noexcept
 		{ return  vector+=scalar; }
 		[[nodiscard]] friend constexpr Vector3T operator-(Vector3T vector, Type scalar) noexcept
 		{ return  vector-=scalar; }
+		[[nodiscard]] friend constexpr Vector3T operator-(Type scalar, Vector3T vector) noexcept
+		{ return Vector3T(scalar-vector.x, scalar-vector.y, scalar-vector.z);}
 		[[nodiscard]] friend constexpr Vector3T operator*(Vector3T vector, const Type scalar) noexcept
 		{ return  vector*=scalar; }
 		[[nodiscard]] friend constexpr Vector3T operator*(const Type scalar, Vector3T vector) noexcept
@@ -118,11 +126,7 @@ namespace Math
 		[[nodiscard]] friend constexpr Vector3T operator/(Vector3T vector,const Type scalar) noexcept
 		{ return  vector/=scalar; }
 		[[nodiscard]] friend constexpr Vector3T operator/(Type scalar, Vector3T vector) noexcept
-		{ return Vector2T(scalar/vector.x,scalar/vector.y,scalar/vector.z); }
-		[[nodiscard]] friend constexpr Vector3T operator*(const Vector3T vector_a, const Vector3T vector_b) noexcept
-		{ return vector_a*=vector_b; }
-		[[nodiscard]] friend constexpr Vector3T operator/(const Vector3T vector_a, const Vector3T vector_b) noexcept
-		{ return vector_a/=vector_b; }
+		{ return Vector3T(scalar/vector.x,scalar/vector.y,scalar/vector.z); }
 
 	};
 	template <typename Type>
@@ -199,7 +203,7 @@ namespace Math
 		return Try_normalize(vector).value_or(fallback);
 	}
 	template <std::floating_point Type>
-	[[nodiscard]] bool Is_normalized(const Vector3T<Type> vector) noexcept
+	[[nodiscard]] constexpr bool Is_normalized(const Vector3T<Type> vector) noexcept
 	{
 		return Equals(Length_squared(vector), Type(1));
 	}
@@ -234,7 +238,7 @@ namespace Math
 	template <std::floating_point Type>
 	[[nodiscard]] constexpr Vector3T<Type> Reflect(const Vector3T<Type> incident, const Vector3T<Type> normal) noexcept
 	{
-		assert(Is_normalizable(normal) && "Reflect: 'normal' must be normalized");
+		assert(Is_normalized(normal) && "Reflect: 'normal' must be normalized");
 		return incident - normal * (Type(2) * Dot(incident, normal));
 	}
 
@@ -260,12 +264,12 @@ namespace Math
 	template <typename Type>
 	[[nodiscard]] constexpr Vector3T<Type> Min(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
 	{
-		return Vector4T<Type>(std::min(vector_a.x, vector_b.x), std::min(vector_a.y, vector_b.y), std::min(vector_a.z, vector_b.z));
+		return Vector3T<Type>(std::min(vector_a.x, vector_b.x), std::min(vector_a.y, vector_b.y), std::min(vector_a.z, vector_b.z));
 	}
 	template <typename Type>
 	[[nodiscard]] constexpr Vector3T<Type> Max(const Vector3T<Type> vector_a, const Vector3T<Type> vector_b) noexcept
 	{
-	return Vector4T<Type>(std::max(vector_a.x, vector_b.x), std::max(vector_a.y, vector_b.y), std::max(vector_a.z, vector_b.z));
+	    return Vector3T<Type>(std::max(vector_a.x, vector_b.x), std::max(vector_a.y, vector_b.y), std::max(vector_a.z, vector_b.z));
 	}
 	template <typename Type>
 	[[nodiscard]] constexpr Vector3T<Type> Clamp(const Vector3T<Type> vector, const Vector3T<Type> lower, const Vector3T<Type> upper) noexcept
