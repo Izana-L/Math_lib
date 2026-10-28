@@ -27,11 +27,12 @@ namespace Math
 
 		[[nodiscard]] constexpr Type& operator[](std::size_t index) noexcept
 		{
-		     assert(index >= 3 && "[]: Out sides the bounds");
+		    assert(index <= 3 && "operator[]: index must be less than 3");
 			return index == 0 ? x : index == 1 ? y : z;
 		}
 		[[nodiscard]] constexpr const Type& operator[](std::size_t index) const noexcept
 		{
+		    assert(index <= 3 && "operator[]: index must be less than 3");
 			return index == 0 ? x : index == 1 ? y : z;
 		}
 		[[nodiscard]] constexpr Type* Data() noexcept { return &x; }
@@ -119,12 +120,12 @@ namespace Math
 	template <std::floating_point Type>
 	[[nodiscard]] bool Is_normalizable(const Vector3T<Type> vector) noexcept
 	{
-		return std::isfinite(vector.x) && std::isfinite(vector.y) && std::isfinite(vector.z) && (vector.x != 0 ||vector.y != 0 |vector.z != 0 );
+		return std::isfinite(vector.x) && std::isfinite(vector.y) && std::isfinite(vector.z) && (vector.x != 0 ||vector.y != 0 ||vector.z != 0 );
 	}
 	template <std::floating_point Type>
 	[[nodiscard]] Vector3T<Type> Normalize(const Vector3T<Type> vector) noexcept
 	{
-	    assert(!Is_normalizable(vector) && "Normalize: cannot normalize a zero vector or infinites values");
+	    assert(Is_normalizable(vector) && "Normalize: cannot normalize a zero vector or infinites values");
 
 		constexpr Type epsilon = std::numeric_limits<Type>::epsilon();
 		constexpr Type lower_limit = std::numeric_limits<Type>::min() / epsilon;

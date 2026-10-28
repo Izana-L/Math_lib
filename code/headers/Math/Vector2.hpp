@@ -25,11 +25,12 @@ namespace Math
 
 		[[nodiscard]] constexpr Type& operator[](std::size_t index) noexcept
 		{
-		    assert(index >= 2 && "[]: Out sides the bounds");
+		    assert(index <= 2 && "operator[]: index must be less than 2");
 			return index == 0 ? x : y;
 		}
 		[[nodiscard]] constexpr const Type& operator[](std::size_t index) const noexcept
 		{
+		    assert(index <= 2 && "operator[]: index must be less than 2");
 			return index == 0 ? x : y;
 		}
 		[[nodiscard]] constexpr Type* Data() noexcept { return &x; }
@@ -116,7 +117,7 @@ namespace Math
 	template <std::floating_point Type>
 	[[nodiscard]] Vector2T<Type> Normalize(const Vector2T<Type> vector) noexcept
 	{
-	    assert(!Is_normalizable(vector) && "Normalize: cannot normalize a zero vector or infinites values");
+	    assert(Is_normalizable(vector) && "Normalize: cannot normalize a zero vector or infinites values");
 		constexpr Type epsilon = std::numeric_limits<Type>::epsilon();
 		constexpr Type lower_limit = std::numeric_limits<Type>::min() / epsilon;
 		constexpr Type upper_limit = std::numeric_limits<Type>::max() * epsilon;
