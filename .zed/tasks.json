@@ -41,17 +41,17 @@
 
   // ---------------- WSL / Linux linux-debug ----------------
   {
-    "label": "WSL linux-debug: configurar",
+    "label": "Linux linux-debug: configurar",
     "command": "cmake",
     "args": ["-DPRESET=linux-debug", "-P", "cmake/configure-preset.cmake"]
   },
   {
-    "label": "WSL linux-debug: compilar",
+    "label": "Linux linux-debug: compilar",
     "command": "cmake",
     "args": ["--build", "projects/out/build/linux-debug"]
   },
   {
-    "label": "WSL linux-debug: ejecutar Math_tests",
+    "label": "Linux linux-debug: ejecutar Math_tests",
     "command": "./projects/out/build/linux-debug/Math_tests"
   }
 ]

@@ -22,18 +22,27 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS ${CODE_DIR}/sources/*.cpp)
 file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS ${CODE_DIR}/headers/*.hpp)
 file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS ${CODE_DIR}/tests/*.cpp)
 
+# El test de aislamiento vive en tests/ pero no puede compilarse dentro de Math_tests, que tiene glm.
+set(ISOLATION_SOURCE ${CODE_DIR}/Math_isolation/Isolation.cpp)
+list(REMOVE_ITEM TEST_SOURCES ${ISOLATION_SOURCE})
+
 message(STATUS "CODE_DIR = ${CODE_DIR}")
 message(STATUS "SOURCES  = ${SOURCES}")
 
+# glm: el único sitio con su ruta y sus macros. Solo lo enlazan Math y Math_tests, siempre PRIVATE.
+add_library(Math_glm INTERFACE)
+target_include_directories(Math_glm SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/lib/glm)
+target_compile_definitions(Math_glm INTERFACE GLM_ENABLE_EXPERIMENTAL)
+
 add_library(Math STATIC ${SOURCES} ${HEADERS})
-
-# GLM (header-only)
-target_include_directories(Math SYSTEM PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/lib/glm)
-target_compile_definitions(Math PRIVATE GLM_ENABLE_EXPERIMENTAL)
 target_include_directories(Math PUBLIC ${CODE_DIR}/headers)
+target_link_libraries(Math PRIVATE Math_glm)
 
-
+# Tests: aquí glm sí está permitido, como oráculo.
 add_executable(Math_tests ${TEST_SOURCES})
+target_link_libraries(Math_tests PRIVATE Math Math_glm)
 
-target_link_libraries(Math_tests PRIVATE Math )
+# Test de aislamiento: solo se compila, no se enlaza ni se ejecuta. No enlaza Math_glm.
+add_library(Math_isolation OBJECT ${ISOLATION_SOURCE})
+target_link_libraries(Math_isolation PRIVATE Math)
 # TODO: Add tests and install targets if needed.
