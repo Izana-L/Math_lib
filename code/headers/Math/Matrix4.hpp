@@ -59,11 +59,15 @@ namespace Math
 		}
 		constexpr Matrix4& operator*=(const Matrix4& other_matrix) noexcept
 		{
-    		columns[0] = columns[0] * other_matrix.columns[0].x + columns[1] * other_matrix.columns[0].y + columns[2] * other_matrix.columns[0].z + columns[3] * other_matrix.columns[0].w;
-    		columns[1] = columns[0] * other_matrix.columns[1].x + columns[1] * other_matrix.columns[1].y + columns[2] * other_matrix.columns[1].z + columns[3] * other_matrix.columns[1].w;
-    		columns[2] = columns[0] * other_matrix.columns[2].x + columns[1] * other_matrix.columns[2].y + columns[2] * other_matrix.columns[2].z + columns[3] * other_matrix.columns[2].w;
-    		columns[3] = columns[0] * other_matrix.columns[3].x + columns[1] * other_matrix.columns[3].y + columns[2] * other_matrix.columns[3].z + columns[3] * other_matrix.columns[3].w;
-			return *this;
+        	const Vector4 column0 = columns[0] * other_matrix.columns[0].x + columns[1] * other_matrix.columns[0].y + columns[2] * other_matrix.columns[0].z + columns[3] * other_matrix.columns[0].w;
+        	const Vector4 column1 = columns[0] * other_matrix.columns[1].x + columns[1] * other_matrix.columns[1].y + columns[2] * other_matrix.columns[1].z + columns[3] * other_matrix.columns[1].w;
+        	const Vector4 column2 = columns[0] * other_matrix.columns[2].x + columns[1] * other_matrix.columns[2].y + columns[2] * other_matrix.columns[2].z + columns[3] * other_matrix.columns[2].w;
+        	const Vector4 column3 = columns[0] * other_matrix.columns[3].x + columns[1] * other_matrix.columns[3].y + columns[2] * other_matrix.columns[3].z + columns[3] * other_matrix.columns[3].w;
+        	columns[0] = column0;
+        	columns[1] = column1;
+        	columns[2] = column2;
+        	columns[3] = column3;
+        	return *this;
 		}
 		Matrix4& operator/=(const Matrix4& other_matrix) noexcept;
 		constexpr Matrix4& operator+=(const float scalar) noexcept
@@ -157,17 +161,17 @@ namespace Math
 			left_yz * right_xw - left_yw * right_xz + left_zw * right_xy;
 	}
 
-	[[nodiscard]] inline bool Is_invertible(const Matrix4 matrix) noexcept
+	[[nodiscard]] inline bool Is_invertible(const Matrix4& matrix) noexcept
 	{
 	    return std::isnormal(Determinant(matrix));
 	}
 
-	[[nodiscard]] Matrix4 Inverse(const Matrix4 matrix) noexcept;
+	[[nodiscard]] Matrix4 Inverse(const Matrix4& matrix) noexcept;
 	inline Matrix4& Matrix4::operator/=(const Matrix4& other_matrix) noexcept
 	{
 		return *this *= Inverse(other_matrix);
 	}
-	[[nodiscard]] inline std::optional<Matrix4> Try_inverse(const Matrix4 matrix) noexcept
+	[[nodiscard]] inline std::optional<Matrix4> Try_inverse(const Matrix4& matrix) noexcept
 	{
 	    if (!Is_invertible(matrix))
 	    {
@@ -175,8 +179,8 @@ namespace Math
 		}
 		return Inverse(matrix);
 	}
-	template <std::floating_point Type>
-	[[nodiscard]] Matrix4 Inverse_or(const Matrix4 matrix, const Matrix4 fallback) noexcept
+
+	[[nodiscard]] inline Matrix4 Inverse_or(const Matrix4& matrix, const Matrix4 fallback) noexcept
 	{
 		return Try_inverse(matrix).value_or(fallback);
 	}

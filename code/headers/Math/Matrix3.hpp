@@ -51,10 +51,13 @@ namespace Math
 		}
 		constexpr Matrix3& operator*=(const Matrix3& other_matrix) noexcept
 		{
-			columns[0] = columns[0] * other_matrix.columns[0].x + columns[1] * other_matrix.columns[0].y + columns[2] * other_matrix.columns[0].z;
-			columns[1] = columns[0] * other_matrix.columns[1].x + columns[1] * other_matrix.columns[1].y + columns[2] * other_matrix.columns[1].z;
-			columns[2] = columns[0] * other_matrix.columns[2].x + columns[1] * other_matrix.columns[2].y + columns[2] * other_matrix.columns[2].z;
-			return *this;
+        	const Vector3 column0 = columns[0] * other_matrix.columns[0].x + columns[1] * other_matrix.columns[0].y + columns[2] * other_matrix.columns[0].z;
+        	const Vector3 column1 = columns[0] * other_matrix.columns[1].x + columns[1] * other_matrix.columns[1].y + columns[2] * other_matrix.columns[1].z;
+        	const Vector3 column2 = columns[0] * other_matrix.columns[2].x + columns[1] * other_matrix.columns[2].y + columns[2] * other_matrix.columns[2].z;
+        	columns[0] = column0;
+        	columns[1] = column1;
+        	columns[2] = column2;
+        	return *this;
 		}
 		Matrix3& operator/=(const Matrix3& other_matrix) noexcept;
 		constexpr Matrix3& operator+=(const float scalar) noexcept
@@ -128,14 +131,14 @@ namespace Math
 	    return std::isnormal(Determinant(matrix));
 	}
 
-	[[nodiscard]] Matrix3 Inverse(const Matrix3 matrix) noexcept;
+	[[nodiscard]] Matrix3 Inverse(const Matrix3& matrix) noexcept;
 
 	inline Matrix3& Matrix3::operator/=(const Matrix3& other_matrix) noexcept
 	{
 		return *this *= Inverse(other_matrix);
 	}
 
-	[[nodiscard]]  inline std::optional<Matrix3> Try_inverse(const Matrix3 matrix) noexcept
+	[[nodiscard]]  inline std::optional<Matrix3> Try_inverse(const Matrix3& matrix) noexcept
 	{
 	    if (!Is_invertible(matrix))
 	    {
@@ -143,8 +146,8 @@ namespace Math
 		}
 		return Inverse(matrix);
 	}
-	template <std::floating_point Type>
-	[[nodiscard]] Matrix3 Inverse_or(const Matrix3 matrix, const Matrix3 fallback) noexcept
+
+	[[nodiscard]] inline Matrix3 Inverse_or(const Matrix3& matrix, const Matrix3 fallback) noexcept
 	{
 		return Try_inverse(matrix).value_or(fallback);
 	}
