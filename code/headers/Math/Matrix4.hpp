@@ -49,22 +49,40 @@ namespace Math
 		{
 			return Matrix4(Matrix3(), translation);
 		}
+		[[nodiscard]] constexpr static Matrix4 Scale(const Vector3 scale) noexcept
+		{
+			return Matrix4(Matrix3::Scale(scale), Vector3());
+		}
+
+		[[nodiscard]] static Matrix4 Rotation_x(const Radians angle) noexcept
+		{
+			return Matrix4(Matrix3::Rotation_x(angle), Vector3());
+		}
+
+		[[nodiscard]] static Matrix4 Rotation_y(const Radians angle) noexcept
+		{
+			return Matrix4(Matrix3::Rotation_y(angle), Vector3());
+		}
+
+		[[nodiscard]] static Matrix4 Rotation_z(const Radians angle) noexcept
+		{
+			return Matrix4(Matrix3::Rotation_z(angle), Vector3());
+		}
+
+		[[nodiscard]] static Matrix4 Rotation(const Vector3 axis, const Radians angle) noexcept
+		{
+			return Matrix4(Matrix3::Rotation(axis, angle), Vector3());
+		}
+
+		[[nodiscard]] constexpr static Matrix4 Rotation(const Quaternion rotation) noexcept
+		{
+			return Matrix4(To_matrix3(rotation), Vector3());
+		}
 		[[nodiscard]] constexpr static Matrix4 TRS(const Vector3 translation, const Quaternion rotation, const Vector3 scale) noexcept
 		{
-			assert(Equals(rotation.x * rotation.x + rotation.y * rotation.y + rotation.z * rotation.z + rotation.w * rotation.w, 1.0f) && "TRS: 'rotation' must be a normalized quaternion");
-			const float xx = rotation.x * rotation.x;
-			const float yy = rotation.y * rotation.y;
-			const float zz = rotation.z * rotation.z;
-			const float xy = rotation.x * rotation.y;
-			const float xz = rotation.x * rotation.z;
-			const float yz = rotation.y * rotation.z;
-			const float wx = rotation.w * rotation.x;
-			const float wy = rotation.w * rotation.y;
-			const float wz = rotation.w * rotation.z;
-			return Matrix4(Matrix3(Vector3(1.0f - 2.0f * (yy + zz), 2.0f * (xy + wz), 2.0f * (xz - wy)) * scale.x,
-								   Vector3(2.0f * (xy - wz), 1.0f - 2.0f * (xx + zz), 2.0f * (yz + wx)) * scale.y,
-								   Vector3(2.0f * (xz + wy), 2.0f * (yz - wx), 1.0f - 2.0f * (xx + yy)) * scale.z),
-						   translation);
+			assert(detail::Is_unit_quaternion(rotation) && "TRS: 'rotation' must be a normalized quaternion");
+			const Matrix3 axes = To_matrix3(rotation);
+			return Matrix4(Matrix3(axes[0] * scale.x, axes[1] * scale.y, axes[2] * scale.z), translation);
 		}
 
 		[[nodiscard]] friend constexpr bool operator==(const Matrix4& vector, const Matrix4& other_vector)  noexcept = default;
@@ -196,7 +214,10 @@ namespace Math
 	{
 	    return std::isnormal(Determinant(matrix));
 	}
-
+	[[nodiscard]] inline bool Is_singular(const Matrix4& matrix) noexcept
+	{
+		return !Is_invertible(matrix);
+	}
 	[[nodiscard]] Matrix4 Inverse(const Matrix4& matrix) noexcept;
 	inline Matrix4& Matrix4::operator/=(const Matrix4& other_matrix) noexcept
 	{
@@ -237,7 +258,15 @@ namespace Math
 			   Equals(matrix_a[2], matrix_b[2], absolute_tolerance, relative_tolerance) &&
 			   Equals(matrix_a[3], matrix_b[3], absolute_tolerance, relative_tolerance);
 	}
+	[[nodiscard]] constexpr bool Is_identity(const Matrix4& matrix) noexcept
+	{
+		return Equals(matrix, Matrix4::Identity());
+	}
 
+	[[nodiscard]] constexpr bool Is_identity(const Matrix4& matrix, const float absolute_tolerance, const float relative_tolerance) noexcept
+	{
+		return Equals(matrix, Matrix4::Identity(), absolute_tolerance, relative_tolerance);
+	}
 	[[nodiscard]] constexpr bool Is_orthonormal(const Matrix4& matrix) noexcept
 	{
 		return Is_orthonormal(matrix.Upper_left());
@@ -267,7 +296,10 @@ namespace Math
 	{
 		return matrix[3].Xyz();
 	}
-
+	[[nodiscard]] constexpr Vector4 Transform_vector4(const Matrix4& matrix, const Vector4 vector) noexcept
+	{
+		return matrix[0] * vector.x + matrix[1] * vector.y + matrix[2] * vector.z + matrix[3] * vector.w;
+	}
 	[[nodiscard]] constexpr Vector3 Transform_point(const Matrix4& matrix, const Vector3 point) noexcept
 	{
 		return matrix[0].Xyz() * point.x + matrix[1].Xyz() * point.y + matrix[2].Xyz() * point.z + matrix[3].Xyz();
@@ -334,6 +366,10 @@ namespace Math
 	}
 
 
+	[[nodiscard]] constexpr Matrix4 To_matrix4(const Quaternion rotation) noexcept
+	{
+	    return Matrix4(To_matrix3(rotation), Vector3());
+	}
 
 
 	static_assert(sizeof(Matrix4) == 4 * sizeof(Vector4), "Matrix4 must be exactly 4 Vector4 in size");

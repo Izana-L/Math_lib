@@ -7,7 +7,8 @@
 #include <concepts>
 #include <limits>
 #include <cassert>
-
+#include <bit>
+#include <type_traits>
 namespace Math
 {
 	namespace detail
@@ -20,7 +21,8 @@ namespace Math
 		{
 			return value >= Type(0) ? value : -value;
 		}
-
+		template <typename Type>
+		concept Unsigned_integer = std::unsigned_integral<Type> && !std::same_as<Type, bool>;
 
 		template <typename Type>
 		[[nodiscard]] constexpr Type Sign_of(const Type value) noexcept
@@ -139,5 +141,49 @@ namespace Math
 	[[nodiscard]] T Fract(const T value) noexcept
 	{
 		return value - std::floor(value);
+	}
+
+	template <detail::Unsigned_integer T>
+	[[nodiscard]] constexpr bool Is_power_of_two(const T value) noexcept
+	{
+		return std::has_single_bit(value);
+	}
+
+	template <detail::Unsigned_integer T>
+	[[nodiscard]] constexpr T Next_power_of_two(const T value) noexcept
+	{
+		assert(value <= static_cast<T>(T(1) << (std::numeric_limits<T>::digits - 1)) && "Next_power_of_two: the result does not fit in the type");
+		return std::bit_ceil(value);
+	}
+
+	template <detail::Unsigned_integer T>
+	[[nodiscard]] constexpr T Align_up(const T value, const std::type_identity_t<T> alignment) noexcept
+	{
+		assert(Is_power_of_two(alignment) && "Align_up: 'alignment' must be a power of two");
+		const T mask = static_cast<T>(alignment - 1);
+		assert(value <= std::numeric_limits<T>::max() - mask && "Align_up: the result does not fit in the type");
+		return static_cast<T>((value + mask) & static_cast<T>(~mask));
+	}
+
+	template <detail::Unsigned_integer T>
+	[[nodiscard]] constexpr T Align_down(const T value, const std::type_identity_t<T> alignment) noexcept
+	{
+		assert(Is_power_of_two(alignment) && "Align_down: 'alignment' must be a power of two");
+		const T mask = static_cast<T>(alignment - 1);
+		return static_cast<T>(value & static_cast<T>(~mask));
+	}
+
+	template <detail::Unsigned_integer T>
+	[[nodiscard]] constexpr T Div_ceil(const T numerator, const std::type_identity_t<T> denominator) noexcept
+	{
+		assert(denominator != 0 && "Div_ceil: 'denominator' must not be zero");
+		return static_cast<T>(numerator / denominator + (numerator % denominator != 0 ? 1 : 0));
+	}
+
+	template <detail::Unsigned_integer T>
+	[[nodiscard]] constexpr T Mip_levels(const T width, const std::type_identity_t<T> height) noexcept
+	{
+		assert(width >= 1 && height >= 1 && "Mip_levels: 'width' and 'height' must be at least 1");
+		return static_cast<T>(std::bit_width(width > height ? width : height));
 	}
 }

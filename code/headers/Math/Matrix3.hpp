@@ -31,6 +31,51 @@ namespace Math
 		[[nodiscard]] constexpr static Matrix3 Identity() noexcept { return Matrix3();}
 
 		[[nodiscard]] constexpr static Matrix3 Zero() noexcept { return Matrix3(Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 0.0f, 0.0f)); }
+
+		[[nodiscard]] constexpr static Matrix3 Scale(const Vector3 scale) noexcept
+		{
+			return Matrix3(Vector3(scale.x, 0.0f, 0.0f), Vector3(0.0f, scale.y, 0.0f), Vector3(0.0f, 0.0f, scale.z));
+		}
+
+		[[nodiscard]] static Matrix3 Rotation_x(const Radians angle) noexcept
+		{
+			const float cosine = std::cos(angle.value);
+			const float sine = std::sin(angle.value);
+			return Matrix3(Vector3(1.0f, 0.0f, 0.0f), Vector3(0.0f, cosine, sine), Vector3(0.0f, -sine, cosine));
+		}
+
+		[[nodiscard]] static Matrix3 Rotation_y(const Radians angle) noexcept
+		{
+			const float cosine = std::cos(angle.value);
+			const float sine = std::sin(angle.value);
+			return Matrix3(Vector3(cosine, 0.0f, -sine), Vector3(0.0f, 1.0f, 0.0f), Vector3(sine, 0.0f, cosine));
+		}
+
+		[[nodiscard]] static Matrix3 Rotation_z(const Radians angle) noexcept
+		{
+			const float cosine = std::cos(angle.value);
+			const float sine = std::sin(angle.value);
+			return Matrix3(Vector3(cosine, sine, 0.0f), Vector3(-sine, cosine, 0.0f), Vector3(0.0f, 0.0f, 1.0f));
+		}
+
+		[[nodiscard]] static Matrix3 Rotation(const Vector3 axis, const Radians angle) noexcept
+		{
+			assert(Is_normalized(axis) && "Rotation: 'axis' must be a normalized vector");
+			const float cosine = std::cos(angle.value);
+			const float sine = std::sin(angle.value);
+			const float one_minus_cosine = 1.0f - cosine;
+			const float xy = axis.x * axis.y * one_minus_cosine;
+			const float xz = axis.x * axis.z * one_minus_cosine;
+			const float yz = axis.y * axis.z * one_minus_cosine;
+			const float x_sine = axis.x * sine;
+			const float y_sine = axis.y * sine;
+			const float z_sine = axis.z * sine;
+			return Matrix3(Vector3(axis.x * axis.x * one_minus_cosine + cosine, xy + z_sine, xz - y_sine),
+						   Vector3(xy - z_sine, axis.y * axis.y * one_minus_cosine + cosine, yz + x_sine),
+						   Vector3(xz + y_sine, yz - x_sine, axis.z * axis.z * one_minus_cosine + cosine));
+		}
+
+
 		[[nodiscard]] friend constexpr bool operator==(const Matrix3& vector, const Matrix3& other_vector)  noexcept = default;
 
 		[[nodiscard]] constexpr Matrix3 operator-() const noexcept
@@ -130,7 +175,10 @@ namespace Math
 	{
 	    return std::isnormal(Determinant(matrix));
 	}
-
+	[[nodiscard]] inline bool Is_singular(const Matrix3& matrix) noexcept
+	{
+		return !Is_invertible(matrix);
+	}
 	[[nodiscard]] Matrix3 Inverse(const Matrix3& matrix) noexcept;
 
 	inline Matrix3& Matrix3::operator/=(const Matrix3& other_matrix) noexcept
@@ -172,7 +220,15 @@ namespace Math
 			   Equals(matrix_a[1], matrix_b[1], absolute_tolerance, relative_tolerance) &&
 			   Equals(matrix_a[2], matrix_b[2], absolute_tolerance, relative_tolerance);
 	}
+	[[nodiscard]] constexpr bool Is_identity(const Matrix3& matrix) noexcept
+	{
+		return Equals(matrix, Matrix3::Identity());
+	}
 
+	[[nodiscard]] constexpr bool Is_identity(const Matrix3& matrix, const float absolute_tolerance, const float relative_tolerance) noexcept
+	{
+		return Equals(matrix, Matrix3::Identity(), absolute_tolerance, relative_tolerance);
+	}
 
 	[[nodiscard]] constexpr bool Is_orthonormal(const Matrix3& matrix, const float tolerance) noexcept
 	{
