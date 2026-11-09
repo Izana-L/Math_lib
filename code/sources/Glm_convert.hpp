@@ -5,8 +5,10 @@
 #include <bit>
 #include <type_traits>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <Math/Matrix3.hpp>
 #include <Math/Matrix4.hpp>
+#include <Math/Quaternion.hpp>
 
 namespace Math::detail
 {
@@ -34,5 +36,10 @@ namespace Math::detail
 	[[nodiscard]] inline Matrix4 From_glm(const glm::mat4& matrix) noexcept
 	{
 		return std::bit_cast<Matrix4>(matrix);
+	}
+
+	[[nodiscard]] inline Quaternion From_glm(const glm::quat& quaternion) noexcept
+	{
+		return Quaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
 	}
 }

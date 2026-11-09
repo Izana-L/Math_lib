@@ -126,7 +126,7 @@ namespace Math
 		return Dot(matrix[0], Cross(matrix[1], matrix[2]));
 	}
 
-	[[nodiscard]] inline bool Is_invertible(const Matrix3 matrix) noexcept
+	[[nodiscard]] inline bool Is_invertible(const Matrix3& matrix) noexcept
 	{
 	    return std::isnormal(Determinant(matrix));
 	}
@@ -152,6 +152,67 @@ namespace Math
 		return Try_inverse(matrix).value_or(fallback);
 	}
 
+
+	[[nodiscard]] constexpr Matrix3 Transpose(const Matrix3& matrix) noexcept
+	{
+		return Matrix3(Vector3(matrix[0].x, matrix[1].x, matrix[2].x),
+					   Vector3(matrix[0].y, matrix[1].y, matrix[2].y),
+					   Vector3(matrix[0].z, matrix[1].z, matrix[2].z));
+	}
+
+
+	[[nodiscard]] constexpr bool Equals(const Matrix3& matrix_a, const Matrix3& matrix_b) noexcept
+	{
+		return Equals(matrix_a[0], matrix_b[0]) && Equals(matrix_a[1], matrix_b[1]) && Equals(matrix_a[2], matrix_b[2]);
+	}
+
+	[[nodiscard]] constexpr bool Equals(const Matrix3& matrix_a, const Matrix3& matrix_b, const float absolute_tolerance, const float relative_tolerance) noexcept
+	{
+		return Equals(matrix_a[0], matrix_b[0], absolute_tolerance, relative_tolerance) &&
+			   Equals(matrix_a[1], matrix_b[1], absolute_tolerance, relative_tolerance) &&
+			   Equals(matrix_a[2], matrix_b[2], absolute_tolerance, relative_tolerance);
+	}
+
+
+	[[nodiscard]] constexpr bool Is_orthonormal(const Matrix3& matrix, const float tolerance) noexcept
+	{
+		return Is_normalized(matrix[0], tolerance) && Is_normalized(matrix[1], tolerance) && Is_normalized(matrix[2], tolerance) &&
+			   Equals(Dot(matrix[0], matrix[1]), 0.0f, tolerance, 0.0f) && Equals(Dot(matrix[0], matrix[2]), 0.0f, tolerance, 0.0f) &&
+			   Equals(Dot(matrix[1], matrix[2]), 0.0f, tolerance, 0.0f);
+	}
+
+
+	[[nodiscard]] constexpr bool Is_orthonormal(const Matrix3& matrix) noexcept
+	{
+		return Is_orthonormal(matrix, Epsilon_relative);
+	}
+
+
+	[[nodiscard]] constexpr Matrix3 Normal_matrix(const Matrix3& matrix) noexcept
+	{
+		const float sign = Determinant(matrix) < 0.0f ? -1.0f : 1.0f;
+		return Matrix3(Cross(matrix[1], matrix[2]) * sign,
+					   Cross(matrix[2], matrix[0]) * sign,
+					   Cross(matrix[0], matrix[1]) * sign);
+	}
+
+
+	[[nodiscard]] inline Vector3 Extract_scale(const Matrix3& matrix) noexcept
+	{
+		return Vector3(Length(matrix[0]), Length(matrix[1]), Length(matrix[2]));
+	}
+
+
+	[[nodiscard]] inline Matrix3 Extract_rotation(const Matrix3& matrix) noexcept
+	{
+		assert(Is_normalizable(matrix[0]) && Is_normalizable(matrix[1]) && Is_normalizable(matrix[2]) && "Extract_rotation: no column can be zero or have infinite or NaN values");
+		return Matrix3(Normalize(matrix[0]), Normalize(matrix[1]), Normalize(matrix[2]));
+	}
+
+
+	[[nodiscard]] constexpr Vector3 Right(const Matrix3& matrix) noexcept { return matrix[0]; }
+	[[nodiscard]] constexpr Vector3 Up(const Matrix3& matrix) noexcept { return matrix[1]; }
+	[[nodiscard]] constexpr Vector3 Forward(const Matrix3& matrix) noexcept { return -matrix[2]; }
 
 	static_assert(sizeof(Matrix3) == 3 * sizeof(Vector3), "Matrix3 must be exactly 3 Vector3 in size");
 	static_assert(alignof(Matrix3) == alignof(Vector3), "Matrix3 must not be aligned more strictly than a Vector3s");

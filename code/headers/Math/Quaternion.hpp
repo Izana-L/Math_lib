@@ -1,12 +1,14 @@
 #pragma once
 
+#include <cassert>
 #include <cstddef>
 #include <type_traits>
+#include <Math/Matrix3.hpp>
 
 
 namespace Math
 {
-
+	struct Matrix4;
 	struct Quaternion
 	{
 		float x, y, z, w;
@@ -26,9 +28,9 @@ namespace Math
 		[[nodiscard]] constexpr const float* Data() const noexcept { return &x; }
 
 		[[nodiscard]] constexpr static Quaternion Identity() noexcept { return Quaternion(); }
-
+		[[nodiscard]] static Quaternion From_matrix3(const Matrix3& matrix) noexcept;
+		[[nodiscard]] static Quaternion From_matrix4(const Matrix4& matrix) noexcept;
 		[[nodiscard]] friend constexpr bool operator==(const Quaternion& vector, const Quaternion& other_vector)  noexcept = default;
-
 
 	};
 	static_assert(sizeof(Quaternion) == 4 * sizeof(float), "Quaternion must be exactly 4 floats in size");
@@ -39,4 +41,31 @@ namespace Math
 	static_assert(offsetof(Quaternion, y) == sizeof(float), "y must follow x");
 	static_assert(offsetof(Quaternion, z) == 2 * sizeof(float), "z must follow y");
 	static_assert(offsetof(Quaternion, w) == 3 * sizeof(float), "w must follow z");
+
+	namespace detail
+	{
+
+		[[nodiscard]] constexpr bool Is_unit_quaternion(const Quaternion quaternion) noexcept
+		{
+			return Equals(quaternion.x * quaternion.x + quaternion.y * quaternion.y + quaternion.z * quaternion.z + quaternion.w * quaternion.w, 1.0f);
+		}
+	}
+
+
+	[[nodiscard]] constexpr Matrix3 To_matrix3(const Quaternion rotation) noexcept
+	{
+		assert(detail::Is_unit_quaternion(rotation) && "To_matrix3: 'rotation' must be a normalized quaternion");
+		const float xx = rotation.x * rotation.x;
+		const float yy = rotation.y * rotation.y;
+		const float zz = rotation.z * rotation.z;
+		const float xy = rotation.x * rotation.y;
+		const float xz = rotation.x * rotation.z;
+		const float yz = rotation.y * rotation.z;
+		const float wx = rotation.w * rotation.x;
+		const float wy = rotation.w * rotation.y;
+		const float wz = rotation.w * rotation.z;
+		return Matrix3(Vector3(1.0f - 2.0f * (yy + zz), 2.0f * (xy + wz), 2.0f * (xz - wy)),
+					   Vector3(2.0f * (xy - wz), 1.0f - 2.0f * (xx + zz), 2.0f * (yz + wx)),
+					   Vector3(2.0f * (xz + wy), 2.0f * (yz - wx), 1.0f - 2.0f * (xx + yy)));
+	}
 }
