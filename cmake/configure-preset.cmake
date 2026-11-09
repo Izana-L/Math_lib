@@ -1,16 +1,9 @@
-# Uso: cmake -DPRESET=<nombre> -P cmake/configure-preset.cmake
-#
-# Configura el proyecto con un preset de CMakePresets.json y deja una copia de
-# compile_commands.json en la raíz, que es donde lo busca clangd (Zed).
-# Se hace con un script de CMake y no con "cmd1 && cmd2" para que funcione igual
-# en PowerShell, cmd, bash...
+
 cmake_minimum_required(VERSION 3.21)
 
 if(NOT PRESET)
   message(FATAL_ERROR "Falta -DPRESET=<nombre de un preset de CMakePresets.json>")
 endif()
-
-get_filename_component(ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 
 get_filename_component(ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 # Debe coincidir con "binaryDir" de los presets (projects/out/build/${presetName}).

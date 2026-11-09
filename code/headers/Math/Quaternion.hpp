@@ -24,10 +24,12 @@ namespace Math
 
 		[[nodiscard]] constexpr float& operator[](std::size_t index) noexcept
 		{
+		    assert(index < 4 && "operator[]: index must be less than 4");
 			return index == 0 ? x : index == 1 ? y : index == 2 ? z : w;
 		}
 		[[nodiscard]] constexpr const float& operator[](std::size_t index) const noexcept
 		{
+		    assert(index < 4 && "operator[]: index must be less than 4");
 			return index == 0 ? x : index == 1 ? y : index == 2 ? z : w;
 		}
 		[[nodiscard]] constexpr float* Data() noexcept { return &x; }
@@ -40,7 +42,7 @@ namespace Math
 		[[nodiscard]] static Quaternion From_euler(const Radians yaw, const Radians pitch, const Radians roll) noexcept;
 		[[nodiscard]] static Quaternion From_to_rotation(const Vector3 from, const Vector3 to) noexcept;
 		[[nodiscard]] static Quaternion Look_rotation(const Vector3 forward, const Vector3 up) noexcept;
-		[[nodiscard]] friend constexpr bool operator==(const Quaternion& vector, const Quaternion& other_vector)  noexcept = default;
+		[[nodiscard]] friend constexpr bool operator==(const Quaternion& quaternion, const Quaternion& other_quaternion)  noexcept = default;
 
 
 		constexpr Quaternion& operator*=(const Quaternion other_quaternion) noexcept

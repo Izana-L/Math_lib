@@ -19,7 +19,7 @@ namespace Math
 		template <typename Type>
 		[[nodiscard]] constexpr Type Abs_of(const Type value) noexcept
 		{
-			return value >= Type(0) ? value : -value;
+			return value >= Type(0) ? value : Type(0) - value;
 		}
 		template <typename Type>
 		concept Unsigned_integer = std::unsigned_integral<Type> && !std::same_as<Type, bool>;

@@ -200,7 +200,14 @@ namespace Math
 	{
 		return Equals(Length_squared(vector), Type(1));
 	}
-
+	template <std::floating_point Type>
+	[[nodiscard]] constexpr bool Is_normalized(const Vector2T<Type> vector, const std::type_identity_t<Type> tolerance) noexcept
+	{
+        const Type lower = Type(1) - tolerance;
+        const Type upper = Type(1) + tolerance;
+        const Type length_squared = Length_squared(vector);
+        return length_squared >= lower * lower && length_squared <= upper * upper;
+	}
 	template <std::floating_point Type>
 	[[nodiscard]] constexpr bool Equals(const Vector2T<Type> vector_a, const Vector2T<Type> vector_b) noexcept
 	{

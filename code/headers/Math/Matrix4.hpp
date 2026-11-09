@@ -85,11 +85,11 @@ namespace Math
 			return Matrix4(Matrix3(axes[0] * scale.x, axes[1] * scale.y, axes[2] * scale.z), translation);
 		}
 
-		[[nodiscard]] friend constexpr bool operator==(const Matrix4& vector, const Matrix4& other_vector)  noexcept = default;
+		[[nodiscard]] friend constexpr bool operator==(const Matrix4& matrix, const Matrix4& other_matrix)  noexcept = default;
 
 		[[nodiscard]] constexpr Matrix4 operator-() const noexcept
-		{return Matrix4(-columns[0], -columns[1],-columns[2],-columns[3]);}
-		constexpr Matrix4& operator+=(const Matrix4 other_matrix) noexcept
+		{ return Matrix4(-columns[0], -columns[1],-columns[2],-columns[3]); }
+		constexpr Matrix4& operator+=(const Matrix4& other_matrix) noexcept
 		{
     		columns[0]+=other_matrix.columns[0];
     		columns[1]+=other_matrix.columns[1];
@@ -97,7 +97,7 @@ namespace Math
             columns[3]+=other_matrix.columns[3];
     		return *this;
 		}
-		constexpr Matrix4& operator-=(const Matrix4 other_matrix) noexcept
+		constexpr Matrix4& operator-=(const Matrix4& other_matrix) noexcept
 		{
 		    columns[0]-=other_matrix.columns[0];
     		columns[1]-=other_matrix.columns[1];
@@ -151,11 +151,11 @@ namespace Math
         	return *this;
 	    }
 
-		[[nodiscard]] friend constexpr Matrix4 operator+( Matrix4 matrix_a, const Matrix4 matrix_b) noexcept
+		[[nodiscard]] friend constexpr Matrix4 operator+( Matrix4 matrix_a, const Matrix4& matrix_b) noexcept
 		{ return matrix_a+=matrix_b; }
-		[[nodiscard]] friend constexpr Matrix4 operator-(Matrix4 matrix_a, const Matrix4 matrix_b) noexcept
+		[[nodiscard]] friend constexpr Matrix4 operator-(Matrix4 matrix_a, const Matrix4& matrix_b) noexcept
 		{ return  matrix_a-=matrix_b; }
-		[[nodiscard]] friend constexpr Matrix4 operator*( Matrix4 matrix_a, const Matrix4 matrix_b) noexcept
+		[[nodiscard]] friend constexpr Matrix4 operator*( Matrix4 matrix_a, const Matrix4& matrix_b) noexcept
 		{ return matrix_a*=matrix_b; }
 		[[nodiscard]] friend Matrix4 operator/(const Matrix4& matrix_a, const Matrix4& matrix_b) noexcept
 		{
@@ -179,7 +179,6 @@ namespace Math
 		{ return  matrix/=scalar; }
 		[[nodiscard]] friend constexpr Matrix4 operator/(const float scalar, Matrix4 matrix) noexcept
 		{ return Matrix4(scalar/matrix.columns[0],scalar/matrix.columns[1],scalar/matrix.columns[2],scalar/matrix.columns[3]); }
-
 	};
 
 	[[nodiscard]] constexpr Vector3 Right(const Matrix4& matrix) noexcept { return matrix[0].Xyz(); }
@@ -232,7 +231,7 @@ namespace Math
 		return Inverse(matrix);
 	}
 
-	[[nodiscard]] inline Matrix4 Inverse_or(const Matrix4& matrix, const Matrix4 fallback) noexcept
+	[[nodiscard]] inline Matrix4 Inverse_or(const Matrix4& matrix, const Matrix4& fallback) noexcept
 	{
 		return Try_inverse(matrix).value_or(fallback);
 	}

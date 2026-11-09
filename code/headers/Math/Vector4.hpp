@@ -218,9 +218,12 @@ namespace Math
 	}
 
 	template <std::floating_point Type>
-	[[nodiscard]] constexpr bool Is_normalized(const Vector4T<Type> vector, const Type tolerance) noexcept
+	[[nodiscard]] constexpr bool Is_normalized(const Vector4T<Type> vector, const std::type_identity_t<Type> tolerance) noexcept
 	{
-		return Equals(Length_squared(vector), Type(1), tolerance, Type(0));
+        const Type lower = Type(1) - tolerance;
+        const Type upper = Type(1) + tolerance;
+        const Type length_squared = Length_squared(vector);
+        return length_squared >= lower * lower && length_squared <= upper * upper;
 	}
 
 	template <std::floating_point Type>
