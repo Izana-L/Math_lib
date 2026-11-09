@@ -25,6 +25,11 @@ namespace Math
 		constexpr Vector4T(Vector3T<Type> _vector3, const Type _w) noexcept : x(_vector3.x), y(_vector3.y), z(_vector3.z), w(_w) {}
 		constexpr explicit Vector4T(const Type value) noexcept : x(value), y(value), z(value), w(value) {}
 
+		template <typename U>
+		requires (std::is_arithmetic_v<U> && !std::is_same_v<U, T>)
+		constexpr explicit Vector4T(const Vector4T<U> other) noexcept :
+    		x(detail::Checked_cast<Type>(other.x)), y(detail::Checked_cast<Type>(other.y)),
+    		z(detail::Checked_cast<Type>(other.z)), w(detail::Checked_cast<Type>(other.w)) {}
 		[[nodiscard]] constexpr Type& operator[](std::size_t index) noexcept
 		{
 		    assert(index < 4 && "operator[]: index must be less than 4");
@@ -44,7 +49,10 @@ namespace Math
 		{
 			return Vector3T<Type>(x, y, z);
 		}
-
+		[[nodiscard]] constexpr Vector2T<Type> Xy() const noexcept
+		{
+			return Vector2T<Type>(x, y);
+		}
 		[[nodiscard]] constexpr Vector4T operator-() const noexcept requires (!std::unsigned_integral<Type>)
 		{return Vector4T(-x, -y,-z,-w);}
 		constexpr Vector4T& operator+=(const Vector4T other_vector) noexcept

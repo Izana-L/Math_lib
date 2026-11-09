@@ -25,6 +25,10 @@ namespace Math
 		constexpr Vector3T(Vector2T<Type> _vector2, const Type _z) noexcept : x(_vector2.x), y(_vector2.y), z(_z) {}
 		constexpr explicit Vector3T(const Type value) noexcept : x(value), y(value), z(value) {}
 
+		template <typename U>
+		requires (std::is_arithmetic_v<U> && !std::is_same_v<U, T>)
+		constexpr explicit Vector3T(const Vector3T<U> other) noexcept :
+		    x(detail::Checked_cast<Type>(other.x)), y(detail::Checked_cast<Type>(other.y)), z(detail::Checked_cast<Type>(other.z)) {}
 		[[nodiscard]] constexpr Type& operator[](std::size_t index) noexcept
 		{
 		    assert(index < 3 && "operator[]: index must be less than 3");

@@ -23,6 +23,10 @@ namespace Math
 		constexpr Vector2T(const Type _x, const Type _y) noexcept : x(_x), y(_y) {}
 		constexpr explicit Vector2T(const Type value) noexcept : x(value), y(value) {}
 
+		template <typename U>
+		requires (std::is_arithmetic_v<U> && !std::is_same_v<U, T>)
+		constexpr explicit Vector2T(const Vector2T<U> other) noexcept :
+		    x(detail::Checked_cast<Type>(other.x)), y(detail::Checked_cast<Type>(other.y)) {}
 		[[nodiscard]] constexpr Type& operator[](std::size_t index) noexcept
 		{
 		    assert(index < 2 && "operator[]: index must be less than 2");

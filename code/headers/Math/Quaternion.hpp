@@ -101,11 +101,6 @@ namespace Math
 	namespace detail
 	{
 
-		[[nodiscard]] constexpr bool Is_unit_quaternion(const Quaternion quaternion) noexcept
-		{
-			return Equals(quaternion.x * quaternion.x + quaternion.y * quaternion.y + quaternion.z * quaternion.z + quaternion.w * quaternion.w, 1.0f);
-		}
-
 		[[nodiscard]] constexpr Vector4 To_vector4(const Quaternion quaternion) noexcept
 		{
 			return Vector4(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
@@ -118,10 +113,37 @@ namespace Math
 		}
 	}
 
+	[[nodiscard]] constexpr float Dot(const Quaternion quaternion_a, const Quaternion quaternion_b) noexcept
+	{
+		return quaternion_a.x * quaternion_b.x + quaternion_a.y * quaternion_b.y + quaternion_a.z * quaternion_b.z + quaternion_a.w * quaternion_b.w;
+	}
+
+	[[nodiscard]] constexpr float Length_squared(const Quaternion quaternion) noexcept
+	{
+		return Dot(quaternion, quaternion);
+	}
+	[[nodiscard]] constexpr bool Is_normalized(const Quaternion quaternion) noexcept
+	{
+		return Equals(Length_squared(quaternion), 1.0f);
+	}
+
+
+	[[nodiscard]] constexpr bool Is_normalized(const Quaternion quaternion, const float tolerance) noexcept
+	{
+		const float lower = 1.0f - tolerance;
+		const float upper = 1.0f + tolerance;
+		const float length_squared = Length_squared(quaternion);
+		return length_squared >= lower * lower && length_squared <= upper * upper;
+	}
+
+	[[nodiscard]] inline bool Is_finite(const Quaternion quaternion) noexcept
+	{
+		return Is_finite(detail::To_vector4(quaternion));
+	}
 
 	[[nodiscard]] constexpr Matrix3 To_matrix3(const Quaternion rotation) noexcept
 	{
-		assert(detail::Is_unit_quaternion(rotation) && "To_matrix3: 'rotation' must be a normalized quaternion");
+		assert(Is_normalized(rotation) && "To_matrix3: 'rotation' must be a normalized quaternion");
 		const float xx = rotation.x * rotation.x;
 		const float yy = rotation.y * rotation.y;
 		const float zz = rotation.z * rotation.z;
@@ -136,15 +158,7 @@ namespace Math
 					   Vector3(2.0f * (xz + wy), 2.0f * (yz - wx), 1.0f - 2.0f * (xx + yy)));
 	}
 
-	[[nodiscard]] constexpr float Dot(const Quaternion quaternion_a, const Quaternion quaternion_b) noexcept
-	{
-		return quaternion_a.x * quaternion_b.x + quaternion_a.y * quaternion_b.y + quaternion_a.z * quaternion_b.z + quaternion_a.w * quaternion_b.w;
-	}
 
-	[[nodiscard]] constexpr float Length_squared(const Quaternion quaternion) noexcept
-	{
-		return Dot(quaternion, quaternion);
-	}
 
 	[[nodiscard]] inline float Length(const Quaternion quaternion) noexcept
 	{
@@ -204,7 +218,7 @@ namespace Math
 
 	[[nodiscard]] constexpr Vector3 Rotate_vector(const Quaternion rotation, const Vector3 vector) noexcept
 	{
-		assert(detail::Is_unit_quaternion(rotation) && "Rotate_vector: 'rotation' must be a normalized quaternion");
+		assert(Is_normalized(rotation) && "Rotate_vector: 'rotation' must be a normalized quaternion");
 		const Vector3 axis_part(rotation.x, rotation.y, rotation.z);
 		const Vector3 twice_cross = Cross(axis_part, vector) * 2.0f;
 		return vector + twice_cross * rotation.w + Cross(axis_part, twice_cross);
@@ -218,7 +232,7 @@ namespace Math
 
 	[[nodiscard]] inline Radians Angle_between(const Quaternion from, const Quaternion to) noexcept
 	{
-		assert(detail::Is_unit_quaternion(from) && detail::Is_unit_quaternion(to) && "Angle_between: 'from' and 'to' must be normalized quaternions");
+		assert(Is_normalized(from) && Is_normalized(to) && "Angle_between: 'from' and 'to' must be normalized quaternions");
 		const Quaternion relative = Conjugate(from) * to;
 		return Radians(2.0f * std::atan2(Length(Vector3(relative.x, relative.y, relative.z)), detail::Abs_of(relative.w)));
 	}
@@ -232,13 +246,13 @@ namespace Math
 
 	[[nodiscard]] inline Quaternion Nlerp(const Quaternion from, const Quaternion to, const float factor) noexcept
 	{
-		assert(detail::Is_unit_quaternion(from) && detail::Is_unit_quaternion(to) && "Nlerp: 'from' and 'to' must be normalized quaternions");
+		assert(Is_normalized(from) && Is_normalized(to) && "Nlerp: 'from' and 'to' must be normalized quaternions");
 		return Normalize(Lerp(from, to, factor));
 	}
 
 	[[nodiscard]] inline Quaternion Slerp(const Quaternion from, const Quaternion to, const float factor) noexcept
 	{
-		assert(detail::Is_unit_quaternion(from) && detail::Is_unit_quaternion(to) && "Slerp: 'from' and 'to' must be normalized quaternions");
+		assert(Is_normalized(from) && Is_normalized(to) && "Slerp: 'from' and 'to' must be normalized quaternions");
 		const float cosine = Dot(from, to);
 		const float sign = cosine < 0.0f ? -1.0f : 1.0f;
 		const float short_cosine = sign * cosine;
@@ -256,7 +270,7 @@ namespace Math
 
 	[[nodiscard]] inline Quaternion Rotate_towards(const Quaternion from, const Quaternion to, const Radians max_angle) noexcept
 	{
-		assert(detail::Is_unit_quaternion(from) && detail::Is_unit_quaternion(to) && "Rotate_towards: 'from' and 'to' must be normalized quaternions");
+		assert(Is_normalized(from) && Is_normalized(to) && "Rotate_towards: 'from' and 'to' must be normalized quaternions");
 		assert(max_angle.value >= 0.0f && "Rotate_towards: 'max_angle' must be more or equal than 0");
 		const Radians angle = Angle_between(from, to);
 		if (angle <= max_angle)
@@ -269,7 +283,7 @@ namespace Math
 
 	[[nodiscard]] inline AxisAngle To_axis_angle(const Quaternion rotation) noexcept
 	{
-		assert(detail::Is_unit_quaternion(rotation) && "To_axis_angle: 'rotation' must be a normalized quaternion");
+		assert(Is_normalized(rotation) && "To_axis_angle: 'rotation' must be a normalized quaternion");
 		const float sign = rotation.w < 0.0f ? -1.0f : 1.0f;
 		const Vector3 axis_part(sign * rotation.x, sign * rotation.y, sign * rotation.z);
 		if (!Is_normalizable(axis_part))
@@ -281,7 +295,7 @@ namespace Math
 
 	[[nodiscard]] inline EulerAngles To_euler(const Quaternion rotation) noexcept
 	{
-		assert(detail::Is_unit_quaternion(rotation) && "To_euler: 'rotation' must be a normalized quaternion");
+		assert(Is_normalized(rotation) && "To_euler: 'rotation' must be a normalized quaternion");
 		const float xx = rotation.x * rotation.x;
 		const float yy = rotation.y * rotation.y;
 		const float zz = rotation.z * rotation.z;

@@ -80,7 +80,7 @@ namespace Math
 		}
 		[[nodiscard]] constexpr static Matrix4 TRS(const Vector3 translation, const Quaternion rotation, const Vector3 scale) noexcept
 		{
-			assert(detail::Is_unit_quaternion(rotation) && "TRS: 'rotation' must be a normalized quaternion");
+			assert(Is_normalized(rotation) && "TRS: 'rotation' must be a normalized quaternion");
 			const Matrix3 axes = To_matrix3(rotation);
 			return Matrix4(Matrix3(axes[0] * scale.x, axes[1] * scale.y, axes[2] * scale.z), translation);
 		}
@@ -179,6 +179,7 @@ namespace Math
 		{ return  matrix/=scalar; }
 		[[nodiscard]] friend constexpr Matrix4 operator/(const float scalar, Matrix4 matrix) noexcept
 		{ return Matrix4(scalar/matrix.columns[0],scalar/matrix.columns[1],scalar/matrix.columns[2],scalar/matrix.columns[3]); }
+		friend constexpr Vector4 operator*(const Matrix4& matrix, const Vector4 vector) noexcept;
 	};
 
 	[[nodiscard]] constexpr Vector3 Right(const Matrix4& matrix) noexcept { return matrix[0].Xyz(); }
@@ -298,6 +299,10 @@ namespace Math
 	[[nodiscard]] constexpr Vector4 Transform_vector4(const Matrix4& matrix, const Vector4 vector) noexcept
 	{
 		return matrix[0] * vector.x + matrix[1] * vector.y + matrix[2] * vector.z + matrix[3] * vector.w;
+	}
+	[[nodiscard]] constexpr Vector4 operator*(const Matrix4& matrix, const Vector4 vector) noexcept
+	{
+		return Transform_vector4(matrix, vector);
 	}
 	[[nodiscard]] constexpr Vector3 Transform_point(const Matrix4& matrix, const Vector3 point) noexcept
 	{

@@ -9,6 +9,7 @@
 #include <cassert>
 #include <bit>
 #include <type_traits>
+#include <utility>
 namespace Math
 {
 	namespace detail
@@ -35,6 +36,22 @@ namespace Math
 			{
 				return static_cast<Type>((Type(0) < value) - (value < Type(0)));
 			}
+		}
+
+		template <typename To, typename From>
+		[[nodiscard]] constexpr To Checked_cast(const From value) noexcept
+		{
+			if constexpr (std::integral<From> && std::integral<To>)
+			{
+				assert(std::in_range<To>(value) && "Checked_cast: the value does not fit in the destination type");
+			}
+			else if constexpr (std::floating_point<From> && std::integral<To>)
+			{
+				[[maybe_unused]] constexpr From lower = static_cast<From>(std::numeric_limits<To>::min());
+				[[maybe_unused]] constexpr From upper = static_cast<From>(To(1) << (std::numeric_limits<To>::digits - 1)) * From(2);
+				assert(value >= lower && value < upper && "Checked_cast: the value is NaN, infinite or does not fit in the destination type");
+			}
+			return static_cast<To>(value);
 		}
 	}
 

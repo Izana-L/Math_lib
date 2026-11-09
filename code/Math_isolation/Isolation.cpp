@@ -13,20 +13,11 @@
 //    la línea de comandos, es decir, lo que propaga el target Math.
 //    Si solo lo marca el editor y compilar funciona, clangd no encuentra este archivo
 //    en compile_commands.json y le aplica los flags de otro: compila para actualizarlo.
-#ifdef GLM_ENABLE_EXPERIMENTAL
+#if defined(GLM_ENABLE_EXPERIMENTAL) || defined(GLM_FORCE_DEPTH_ZERO_TO_ONE) || defined(GLM_FORCE_QUAT_DATA_XYZW)
 #error "Math propaga Math_glm a quien lo enlaza: debe enlazarlo como PRIVATE. Si solo sale en el editor, compile_commands.json esta desactualizado."
 #endif
 
-#include <Math/Angle.hpp>
-#include <Math/Constants.hpp>
-#include <Math/Hash.hpp>
-#include <Math/Matrix3.hpp>
-#include <Math/Matrix4.hpp>
-#include <Math/Quaternion.hpp>
-#include <Math/Scalar.hpp>
-#include <Math/Vector2.hpp>
-#include <Math/Vector3.hpp>
-#include <Math/Vector4.hpp>
+#include <Math/Math.hpp>
 
 // 2. Todos los headers de glm incluyen glm/detail/setup.hpp, que define GLM_SETUP_INCLUDED.
 //    Si glm no está instalado en el sistema, el #include de glm ya falla antes de llegar aquí.

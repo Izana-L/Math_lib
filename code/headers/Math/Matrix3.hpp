@@ -162,7 +162,7 @@ namespace Math
 		{ return  matrix/=scalar; }
 		[[nodiscard]] friend constexpr Matrix3 operator/(const float scalar, Matrix3 matrix) noexcept
 		{ return Matrix3(scalar/matrix.columns[0],scalar/matrix.columns[1],scalar/matrix.columns[2]); }
-
+		friend constexpr Vector3 operator*(const Matrix3& matrix, const Vector3 vector) noexcept;
 
 	};
 
@@ -252,12 +252,18 @@ namespace Math
 					   Cross(matrix[0], matrix[1]) * sign);
 	}
 
-
+	[[nodiscard]] constexpr Vector3 Transform_direction(const Matrix3& matrix, const Vector3 direction) noexcept
+	{
+		return matrix[0] * direction.x + matrix[1] * direction.y + matrix[2] * direction.z;
+	}
+	[[nodiscard]] constexpr Vector3 operator*(const Matrix3& matrix, const Vector3 vector) noexcept
+	{
+		return Transform_direction(matrix, vector);
+	}
 	[[nodiscard]] inline Vector3 Extract_scale(const Matrix3& matrix) noexcept
 	{
 		return Vector3(Length(matrix[0]), Length(matrix[1]), Length(matrix[2]));
 	}
-
 
 	[[nodiscard]] inline Matrix3 Extract_rotation(const Matrix3& matrix) noexcept
 	{
