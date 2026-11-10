@@ -3,9 +3,7 @@
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
   cmake_policy(SET CMP0141 NEW)
-  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,
-      $<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>
-      ,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
+  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
 
@@ -41,8 +39,7 @@ message(STATUS "SOURCES  = ${SOURCES}")
 
 
 add_library(Math_glm INTERFACE)
-target_include_directories(Math_glm SYSTEM INTERFACE
-                           ${CMAKE_CURRENT_SOURCE_DIR}/lib/glm)
+target_include_directories(Math_glm SYSTEM INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/lib/glm)
 target_compile_definitions(Math_glm INTERFACE
   GLM_FORCE_DEPTH_ZERO_TO_ONE
   GLM_FORCE_QUAT_DATA_XYZW
@@ -69,8 +66,8 @@ if(MATH_BUILD_TESTS)
   foreach(test_source IN LISTS TEST_SOURCES)
     get_filename_component(test_name ${test_source} NAME_WE)
     add_executable(${test_name} ${test_source})
-    target_include_directories(${test_name} PRIVATE ${CODE_DIR}/sources $
-                               {CODE_DIR}/tests)
+    target_include_directories(${test_name} PRIVATE ${CODE_DIR}/sources
+                               ${CODE_DIR}/tests)
     target_link_libraries(${test_name} PRIVATE Math Math_glm)
     Math_set_warnings(${test_name})
     add_test(NAME ${test_name} COMMAND ${test_name})
@@ -79,14 +76,10 @@ if(MATH_BUILD_TESTS)
 
   # Comprobaciones de aislamiento que no son código C++ (CONVENTIONS.md §13).
   add_test(NAME Math_no_glm_in_public_headers
-           COMMAND ${CMAKE_COMMAND} -DHEADERS_DIR=${CODE_DIR}/headers -P
-                   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-no-glm.cmake)
+           COMMAND ${CMAKE_COMMAND} -DHEADERS_DIR=${CODE_DIR}/headers -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-no-glm.cmake)
   add_test(NAME Math_umbrella_complete
-           COMMAND ${CMAKE_COMMAND} -DHEADERS_DIR=${CODE_DIR}/headers
-                    -DUMBRELLA=Math/Math.hpp -P ${CMAKE_CURRENT_SOURCE_DIR}
-                    /cmake/check-umbrella.cmake)
-  set_tests_properties(Math_no_glm_in_public_headers Math_umbrella_complete
-                       PROPERTIES LABELS "isolation")
+           COMMAND ${CMAKE_COMMAND} -DHEADERS_DIR=${CODE_DIR}/headers -DUMBRELLA=Math/Math.hpp -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-umbrella.cmake)
+  set_tests_properties(Math_no_glm_in_public_headers Math_umbrella_complete PROPERTIES LABELS "isolation")
 
   add_library(Math_isolation OBJECT ${CODE_DIR}/Math_isolation/Isolation.cpp)
   target_link_libraries(Math_isolation PRIVATE Math)
@@ -133,8 +126,7 @@ endif()
 if(PROJECT_IS_TOP_LEVEL AND CMAKE_GENERATOR MATCHES "Ninja|Makefiles")
   add_custom_command(
     OUTPUT ${CMAKE_SOURCE_DIR}/compile_commands.json
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}
-    /compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
 
     DEPENDS ${CMAKE_BINARY_DIR}/compile_commands.json
     COMMENT "Copiando compile_commands.json a la raiz (clangd)"

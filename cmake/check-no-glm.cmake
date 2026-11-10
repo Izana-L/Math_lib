@@ -1,10 +1,9 @@
-# Comprobación de aislamiento (CONVENTIONS.md §13, punto 1): ningún header público
-# contiene la palabra "glm", ni en código ni en comentarios, en mayúsculas o minúsculas.
-# Se ejecuta con: cmake -DHEADERS_DIR=<carpeta> -P check-no-glm.cmake  (lo hace ctest)
+
 cmake_minimum_required(VERSION 3.21)
 
 if(NOT HEADERS_DIR OR NOT IS_DIRECTORY "${HEADERS_DIR}")
-  message(FATAL_ERROR "check-no-glm: HEADERS_DIR no es una carpeta: '${HEADERS_DIR}'")
+  message(FATAL_ERROR "check-no-glm: HEADERS_DIR no es una carpeta:
+          '${HEADERS_DIR}'")
 endif()
 
 file(GLOB_RECURSE headers "${HEADERS_DIR}/*")
