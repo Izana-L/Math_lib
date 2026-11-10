@@ -34,8 +34,8 @@ namespace Math::detail
 	// Clip space (CONVENTIONS.md §2 y §4): diestro y profundidad 0..1. Afecta a las funciones
 	// de glm que se usan como oráculo (perspective, ortho, lookAt...). Reverse-Z y el volteo de
 	// Y no son cosa de glm: los aplica Math en sus propias proyecciones.
-	static_assert((GLM_CONFIG_CLIP_CONTROL & GLM_CLIP_CONTROL_RH_BIT) != 0, "glm must be right-handed (CONVENTIONS.md §2)");
-	static_assert((GLM_CONFIG_CLIP_CONTROL & GLM_CLIP_CONTROL_ZO_BIT) != 0, "glm depth must be 0..1 (CONVENTIONS.md §4)");
+	static_assert((GLM_CONFIG_CLIP_CONTROL & GLM_CLIP_CONTROL_RH_BIT) != 0, "glm must be right-handed ");
+	static_assert((GLM_CONFIG_CLIP_CONTROL & GLM_CLIP_CONTROL_ZO_BIT) != 0, "glm depth must be 0..1 ");
 
 	// Cuaternión (CONVENTIONS.md §6): x, y, z, w en memoria...
 	static_assert(sizeof(glm::quat) == 4 * sizeof(float), "glm::quat must be exactly 4 floats");

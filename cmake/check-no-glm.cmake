@@ -10,7 +10,6 @@ endif()
 file(GLOB_RECURSE headers "${HEADERS_DIR}/*")
 set(found "")
 foreach(header IN LISTS headers)
-  # file(STRINGS) no tiene opción de ignorar mayúsculas: se le pasa la clase de cada letra.
   file(STRINGS "${header}" lines REGEX "[Gg][Ll][Mm]")
   foreach(line IN LISTS lines)
     file(RELATIVE_PATH relative "${HEADERS_DIR}" "${header}")

@@ -5,6 +5,7 @@
 //   (clangd lo usa para el autocompletado). Ejecútalo al empezar y cada vez que
 //   cambies de preset; mientras tanto "compilar" también mantiene esa copia al
 //   día (al añadir o quitar archivos .cpp, o al cambiar un CMakeLists.txt).
+// - "tests" ejecuta todos los tests con ctest (compila antes: ctest no compila).
 // - Windows: abre Zed desde una "Developer PowerShell for VS" (cl.exe + $env{VSINSTALLDIR}).
 // - WSL: abre la carpeta con "projects: open in wsl" y usa las tareas "WSL".
 [
@@ -20,8 +21,9 @@
     "args": ["--build", "projects/out/build/x64-debug"]
   },
   {
-    "label": "Windows x64-debug: ejecutar Math_tests",
-    "command": "projects\\out\\build\\x64-debug\\Math_tests.exe"
+    "label": "Windows x64-debug: tests",
+    "command": "ctest",
+    "args": ["--preset", "x64-debug"]
   },
 
   // ---------------- Windows x64-release ----------------
@@ -36,8 +38,9 @@
     "args": ["--build", "projects/out/build/x64-release"]
   },
   {
-    "label": "Windows x64-release: ejecutar Math_tests",
-    "command": "projects\\out\\build\\x64-release\\Math_tests.exe"
+    "label": "Windows x64-release: tests",
+    "command": "ctest",
+    "args": ["--preset", "x64-release"]
   },
 
   // ---------------- WSL / Linux linux-debug ----------------
@@ -52,7 +55,8 @@
     "args": ["--build", "projects/out/build/linux-debug"]
   },
   {
-    "label": "Linux linux-debug: ejecutar Math_tests",
-    "command": "./projects/out/build/linux-debug/Math_tests"
+    "label": "Linux linux-debug: tests",
+    "command": "ctest",
+    "args": ["--preset", "linux-debug"]
   }
 ]

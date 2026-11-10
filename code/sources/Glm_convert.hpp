@@ -4,7 +4,7 @@
 
 #include <bit>
 #include <type_traits>
-#include "Glm_config.hpp"
+#include "Glm_config.hpp" // IWYU pragma: keep
 #include <Math/Math.hpp>
 
 namespace Math::detail

@@ -1,16 +1,16 @@
-# Comprueba que el header paraguas incluye todos los headers públicos. Así el test de
-# aislamiento, que solo incluye Math.hpp, cubre siempre todos los headers.
-# Se ejecuta con: cmake -DHEADERS_DIR=<carpeta> -DUMBRELLA=Math/Math.hpp -P check-umbrella.cmake
+
 cmake_minimum_required(VERSION 3.21)
 
 if(NOT EXISTS "${HEADERS_DIR}/${UMBRELLA}")
   message(FATAL_ERROR "check-umbrella: no existe ${HEADERS_DIR}/${UMBRELLA}")
 endif()
 
-file(STRINGS "${HEADERS_DIR}/${UMBRELLA}" includes REGEX "^[ \t]*#[ \t]*include[ \t]*<[^>]+>")
+file(STRINGS "${HEADERS_DIR}/${UMBRELLA}" includes REGEX
+     "^[ \t]*#[ \t]*include[ \t]*<[^>]+>")
 set(included "")
 foreach(line IN LISTS includes)
-  string(REGEX REPLACE "^[ \t]*#[ \t]*include[ \t]*<([^>]+)>.*$" "\\1" path "${line}")
+  string(REGEX REPLACE "^[ \t]*#[ \t]*include[ \t]*<([^>]+)>.*$"
+         "\\1" path "${line}")
   list(APPEND included "${path}")
 endforeach()
 
