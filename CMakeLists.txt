@@ -131,6 +131,5 @@ if(PROJECT_IS_TOP_LEVEL AND CMAKE_GENERATOR MATCHES "Ninja|Makefiles")
     DEPENDS ${CMAKE_BINARY_DIR}/compile_commands.json
     COMMENT "Copiando compile_commands.json a la raiz (clangd)"
     VERBATIM)
-  add_custom_target(Math_compile_commands ALL DEPENDS ${CMAKE_SOURCE_DIR}
-                    /compile_commands.json)
+  add_custom_target(Math_compile_commands ALL DEPENDS ${CMAKE_SOURCE_DIR}/compile_commands.json)
 endif()
