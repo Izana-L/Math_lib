@@ -1,0 +1,7 @@
+@PACKAGE_INIT@
+
+# Math no tiene dependencias públicas: glm se queda dentro de la librería y no hace
+# falta para usarla, así que aquí no hay find_dependency(glm).
+include("${CMAKE_CURRENT_LIST_DIR}/MathTargets.cmake")
+
+check_required_components(Math)

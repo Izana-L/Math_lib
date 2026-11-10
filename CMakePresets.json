@@ -101,5 +101,17 @@
                 }
             }
         }
-    ]
+    ],
+    "testPresets": [
+    {
+        "name": "test-base",
+        "hidden": true,
+        "output": { "outputOnFailure": true },
+        "execution": { "noTestsAction": "error" }
+    },
+    { "name": "x64-debug",   "inherits": "test-base", "configurePreset": "x64-debug" },
+    { "name": "x64-release", "inherits": "test-base", "configurePreset": "x64-release" },
+    { "name": "linux-debug", "inherits": "test-base", "configurePreset": "linux-debug" },
+    { "name": "macos-debug", "inherits": "test-base", "configurePreset": "macos-debug" }
+  ]
 }
